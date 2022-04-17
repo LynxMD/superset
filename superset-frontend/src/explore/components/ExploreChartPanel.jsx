@@ -36,7 +36,6 @@ const propTypes = {
   actions: PropTypes.object.isRequired,
   onQuery: PropTypes.func,
   can_overwrite: PropTypes.bool.isRequired,
-  can_download: PropTypes.bool.isRequired,
   datasource: PropTypes.object,
   dashboardId: PropTypes.number,
   column_formats: PropTypes.object,
