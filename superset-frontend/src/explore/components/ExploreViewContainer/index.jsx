@@ -679,7 +679,6 @@ function mapStateToProps(state) {
     controls: explore.controls,
     can_overwrite: !!explore.can_overwrite,
     can_add: !!explore.can_add,
-    can_download: false,
     column_formats: explore.datasource
       ? explore.datasource.column_formats
       : null,

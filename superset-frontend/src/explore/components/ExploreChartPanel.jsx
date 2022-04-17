@@ -29,7 +29,6 @@ import {
   LocalStorageKeys,
 } from 'src/utils/localStorageHelpers';
 import ConnectedExploreChartHeader from './ExploreChartHeader';
-import { DataTablesPane } from './DataTablesPane';
 import { buildV1ChartDataPayload } from '../exploreUtils';
 
 const propTypes = {
@@ -66,7 +65,6 @@ const HEADER_PADDING = 15;
 
 const INITIAL_SIZES = [90, 10];
 const MIN_SIZES = [300, 50];
-const DEFAULT_SOUTH_PANE_HEIGHT_PERCENT = 40;
 
 const Styles = styled.div`
   display: flex;
@@ -172,9 +170,7 @@ const ExploreChartPanel = props => {
     [gutterHeight, gutterMargin, props.height, props.standalone, hHeight],
   );
 
-  const [tableSectionHeight, setTableSectionHeight] = useState(
-    calcSectionHeight(INITIAL_SIZES[1]),
-  );
+  const [setTableSectionHeight] = useState(calcSectionHeight(INITIAL_SIZES[1]));
 
   const recalcPanelSizes = useCallback(
     ([, southPercent]) => {
@@ -195,18 +191,6 @@ const ExploreChartPanel = props => {
     setSplitSizes(sizes);
   };
 
-  const onCollapseChange = openPanelName => {
-    let splitSizes;
-    if (!openPanelName) {
-      splitSizes = INITIAL_SIZES;
-    } else {
-      splitSizes = [
-        100 - DEFAULT_SOUTH_PANE_HEIGHT_PERCENT,
-        DEFAULT_SOUTH_PANE_HEIGHT_PERCENT,
-      ];
-    }
-    setSplitSizes(splitSizes);
-  };
   const renderChart = useCallback(() => {
     const { chart, vizType } = props;
     const newHeight =
@@ -256,9 +240,7 @@ const ExploreChartPanel = props => {
     [chartPanelRef, renderChart],
   );
 
-  const [queryFormData, setQueryFormData] = useState(
-    props.chart.latestQueryFormData,
-  );
+  const [setQueryFormData] = useState(props.chart.latestQueryFormData);
 
   useEffect(() => {
     // only update when `latestQueryFormData` changes AND `triggerRender`
@@ -287,7 +269,6 @@ const ExploreChartPanel = props => {
       ownState={props.ownState}
       actions={props.actions}
       can_overwrite={props.can_overwrite}
-      can_download={props.can_download}
       dashboardId={props.dashboardId}
       isStarred={props.isStarred}
       slice={props.slice}
@@ -322,15 +303,6 @@ const ExploreChartPanel = props => {
           elementStyle={elementStyle}
         >
           {panelBody}
-          <DataTablesPane
-            ownState={props.ownState}
-            queryFormData={queryFormData}
-            tableSectionHeight={tableSectionHeight}
-            onCollapseChange={onCollapseChange}
-            chartStatus={props.chart.chartStatus}
-            errorMessage={props.errorMessage}
-            queriesResponse={props.chart.queriesResponse}
-          />
         </Split>
       )}
     </Styles>

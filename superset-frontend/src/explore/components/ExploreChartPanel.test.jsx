@@ -27,7 +27,6 @@ describe('ChartContainer', () => {
     height: '500px',
     actions: {},
     can_overwrite: false,
-    can_download: false,
     containerId: 'foo',
     width: '50px',
     isStarred: false,

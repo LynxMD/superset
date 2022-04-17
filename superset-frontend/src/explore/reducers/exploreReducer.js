@@ -222,7 +222,6 @@ export default function exploreReducer(state = {}, action) {
         slice: action.slice,
         controls: getControlsState(state, action.form_data),
         can_add: action.can_add,
-        can_download: false,
         can_overwrite: action.can_overwrite,
       };
     },

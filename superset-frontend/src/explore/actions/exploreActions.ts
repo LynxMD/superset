@@ -120,7 +120,6 @@ export function updateChartTitle(sliceName: string) {
 export const CREATE_NEW_SLICE = 'CREATE_NEW_SLICE';
 export function createNewSlice(
   can_add: boolean,
-  can_download: boolean,
   can_overwrite: boolean,
   slice: Slice,
   form_data: QueryFormData,
@@ -128,7 +127,6 @@ export function createNewSlice(
   return {
     type: CREATE_NEW_SLICE,
     can_add,
-    can_download,
     can_overwrite,
     slice,
     form_data,
