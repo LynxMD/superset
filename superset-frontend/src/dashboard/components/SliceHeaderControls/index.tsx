@@ -27,8 +27,6 @@ import {
 } from '@superset-ui/core';
 import { Menu } from 'src/components/Menu';
 import { NoAnimationDropdown } from 'src/components/Dropdown';
-import ShareMenuItems from 'src/dashboard/components/menu/ShareMenuItems';
-import downloadAsImage from 'src/utils/downloadAsImage';
 import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
 import CrossFilterScopingModal from 'src/dashboard/components/CrossFilterScopingModal/CrossFilterScopingModal';
 import Icons from 'src/components/Icons';
@@ -37,10 +35,7 @@ import ViewQueryModal from 'src/explore/components/controls/ViewQueryModal';
 
 const MENU_KEYS = {
   CROSS_FILTER_SCOPING: 'cross_filter_scoping',
-  DOWNLOAD_AS_IMAGE: 'download_as_image',
   EXPLORE_CHART: 'explore_chart',
-  EXPORT_CSV: 'export_csv',
-  EXPORT_FULL_CSV: 'export_full_csv',
   FORCE_REFRESH: 'force_refresh',
   RESIZE_LABEL: 'resize_label',
   TOGGLE_CHART_DESCRIPTION: 'toggle_chart_description',
@@ -105,16 +100,12 @@ export interface SliceHeaderControlsProps {
   forceRefresh: (sliceId: number, dashboardId: number) => void;
   logExploreChart?: (sliceId: number) => void;
   toggleExpandSlice?: (sliceId: number) => void;
-  exportCSV?: (sliceId: number) => void;
-  exportFullCSV?: (sliceId: number) => void;
   handleToggleFullSize: () => void;
 
   addDangerToast: (message: string) => void;
   addSuccessToast: (message: string) => void;
 
   supersetCanExplore?: boolean;
-  supersetCanShare?: boolean;
-  supersetCanCSV?: boolean;
   sliceCanEdit?: boolean;
 }
 interface State {
@@ -155,7 +146,6 @@ class SliceHeaderControls extends React.PureComponent<
 
   handleMenuClick({
     key,
-    domEvent,
   }: {
     key: React.Key;
     domEvent: React.MouseEvent<HTMLElement>;
@@ -178,34 +168,9 @@ class SliceHeaderControls extends React.PureComponent<
         this.props.logExploreChart &&
           this.props.logExploreChart(this.props.slice.slice_id);
         break;
-      case MENU_KEYS.EXPORT_CSV:
-        // eslint-disable-next-line no-unused-expressions
-        this.props.exportCSV && this.props.exportCSV(this.props.slice.slice_id);
-        break;
       case MENU_KEYS.RESIZE_LABEL:
         this.props.handleToggleFullSize();
         break;
-      case MENU_KEYS.EXPORT_FULL_CSV:
-        // eslint-disable-next-line no-unused-expressions
-        this.props.exportFullCSV &&
-          this.props.exportFullCSV(this.props.slice.slice_id);
-        break;
-      case MENU_KEYS.DOWNLOAD_AS_IMAGE: {
-        // menu closes with a delay, we need to hide it manually,
-        // so that we don't capture it on the screenshot
-        const menu = document.querySelector(
-          '.ant-dropdown:not(.ant-dropdown-hidden)',
-        ) as HTMLElement;
-        menu.style.visibility = 'hidden';
-        downloadAsImage(
-          SCREENSHOT_NODE_SELECTOR,
-          this.props.slice.slice_name,
-          // @ts-ignore
-        )(domEvent).then(() => {
-          menu.style.visibility = 'visible';
-        });
-        break;
-      }
       default:
         break;
     }
@@ -217,14 +182,9 @@ class SliceHeaderControls extends React.PureComponent<
       isFullSize,
       cachedDttm = [],
       updatedDttm = null,
-      addSuccessToast = () => {},
-      addDangerToast = () => {},
-      supersetCanShare = false,
       isCached = [],
-      formData,
     } = this.props;
     const crossFilterItems = getChartMetadataRegistry().items;
-    const isTable = slice.viz_type === 'table';
     const isCrossFilter = Object.entries(crossFilterItems)
       // @ts-ignore
       .filter(([, { value }]) =>
@@ -308,37 +268,7 @@ class SliceHeaderControls extends React.PureComponent<
           </Menu.Item>
         )}
 
-        {supersetCanShare && (
-          <ShareMenuItems
-            copyMenuItemTitle={t('Copy permalink to clipboard')}
-            emailMenuItemTitle={t('Share permalink by email')}
-            emailSubject={t('Superset chart')}
-            emailBody={t('Check out this chart: ')}
-            addSuccessToast={addSuccessToast}
-            addDangerToast={addDangerToast}
-            formData={formData}
-          />
-        )}
-
         <Menu.Item key={MENU_KEYS.RESIZE_LABEL}>{resizeLabel}</Menu.Item>
-
-        <Menu.Item key={MENU_KEYS.DOWNLOAD_AS_IMAGE}>
-          {t('Download as image')}
-        </Menu.Item>
-
-        {this.props.slice.viz_type !== 'filter_box' &&
-          this.props.supersetCanCSV && (
-            <Menu.Item key={MENU_KEYS.EXPORT_CSV}>{t('Export CSV')}</Menu.Item>
-          )}
-
-        {this.props.slice.viz_type !== 'filter_box' &&
-          isFeatureEnabled(FeatureFlag.ALLOW_FULL_CSV_EXPORT) &&
-          this.props.supersetCanCSV &&
-          isTable && (
-            <Menu.Item key={MENU_KEYS.EXPORT_FULL_CSV}>
-              {t('Export full CSV')}
-            </Menu.Item>
-          )}
 
         {isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS) &&
           isCrossFilter &&

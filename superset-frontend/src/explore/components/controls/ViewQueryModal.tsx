@@ -20,21 +20,13 @@ import React, { useEffect, useState } from 'react';
 import { ensureIsArray, styled, t } from '@superset-ui/core';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/light';
 import github from 'react-syntax-highlighter/dist/cjs/styles/hljs/github';
-import CopyToClipboard from 'src/components/CopyToClipboard';
 import Loading from 'src/components/Loading';
-import { CopyButton } from 'src/explore/components/DataTableControl';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import { getChartDataRequest } from 'src/components/Chart/chartAction';
 import markdownSyntax from 'react-syntax-highlighter/dist/cjs/languages/hljs/markdown';
 import htmlSyntax from 'react-syntax-highlighter/dist/cjs/languages/hljs/htmlbars';
 import sqlSyntax from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql';
 import jsonSyntax from 'react-syntax-highlighter/dist/cjs/languages/hljs/json';
-
-const CopyButtonViewQuery = styled(CopyButton)`
-  && {
-    margin: 0 0 ${({ theme }) => theme.gridUnit}px;
-  }
-`;
 
 SyntaxHighlighter.registerLanguage('markdown', markdownSyntax);
 SyntaxHighlighter.registerLanguage('html', htmlSyntax);
@@ -102,15 +94,6 @@ const ViewQueryModal: React.FC<Props> = props => {
       {result.map(item =>
         item.query ? (
           <StyledSyntaxContainer key={item.query}>
-            <CopyToClipboard
-              text={item.query}
-              shouldShowText={false}
-              copyNode={
-                <CopyButtonViewQuery buttonSize="xsmall">
-                  <i className="fa fa-clipboard" />
-                </CopyButtonViewQuery>
-              }
-            />
             <StyledSyntaxHighlighter
               language={item.language || undefined}
               style={github}

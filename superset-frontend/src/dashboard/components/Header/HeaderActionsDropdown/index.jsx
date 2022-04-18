@@ -25,7 +25,6 @@ import { Menu } from 'src/components/Menu';
 import { NoAnimationDropdown } from 'src/components/Dropdown';
 import Icons from 'src/components/Icons';
 import { URL_PARAMS } from 'src/constants';
-import ShareMenuItems from 'src/dashboard/components/menu/ShareMenuItems';
 import CssEditor from 'src/dashboard/components/CssEditor';
 import RefreshIntervalModal from 'src/dashboard/components/RefreshIntervalModal';
 import SaveModal from 'src/dashboard/components/SaveModal';
@@ -57,7 +56,7 @@ const propTypes = {
   startPeriodicRender: PropTypes.func.isRequired,
   editMode: PropTypes.bool.isRequired,
   userCanEdit: PropTypes.bool.isRequired,
-  userCanShare: PropTypes.bool.isRequired,
+  // userCanShare: PropTypes.bool.isRequired,
   userCanSave: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   layout: PropTypes.object.isRequired,
@@ -202,26 +201,13 @@ class HeaderActionsDropdown extends React.PureComponent {
       expandedSlices,
       onSave,
       userCanEdit,
-      userCanShare,
       userCanSave,
       isLoading,
       refreshLimit,
       refreshWarning,
       lastModifiedTime,
-      addSuccessToast,
-      addDangerToast,
       filterboxMigrationState,
     } = this.props;
-
-    const emailTitle = t('Superset dashboard');
-    const emailSubject = `${emailTitle} ${dashboardTitle}`;
-    const emailBody = t('Check out this dashboard: ');
-
-    const url = getDashboardUrl({
-      pathname: window.location.pathname,
-      filters: getActiveFilters(),
-      hash: window.location.hash,
-    });
 
     const menu = (
       <Menu
@@ -253,18 +239,6 @@ class HeaderActionsDropdown extends React.PureComponent {
               canOverwrite={userCanEdit}
             />
           </Menu.Item>
-        )}
-        {userCanShare && (
-          <ShareMenuItems
-            url={url}
-            copyMenuItemTitle={t('Copy permalink to clipboard')}
-            emailMenuItemTitle={t('Share permalink by email')}
-            emailSubject={emailSubject}
-            emailBody={emailBody}
-            addSuccessToast={addSuccessToast}
-            addDangerToast={addDangerToast}
-            dashboardId={dashboardId}
-          />
         )}
         <Menu.Item
           key={MENU_KEYS.REFRESH_DASHBOARD}
@@ -310,12 +284,6 @@ class HeaderActionsDropdown extends React.PureComponent {
               templates={this.state.cssTemplates}
               onChange={this.changeCss}
             />
-          </Menu.Item>
-        )}
-
-        {!editMode && (
-          <Menu.Item key={MENU_KEYS.DOWNLOAD_AS_IMAGE}>
-            {t('Download as image')}
           </Menu.Item>
         )}
 

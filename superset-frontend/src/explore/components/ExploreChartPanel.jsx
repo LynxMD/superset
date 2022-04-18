@@ -170,18 +170,18 @@ const ExploreChartPanel = props => {
     [gutterHeight, gutterMargin, props.height, props.standalone, hHeight],
   );
 
-  const [setTableSectionHeight] = useState(calcSectionHeight(INITIAL_SIZES[1]));
-
-  const recalcPanelSizes = useCallback(
-    ([, southPercent]) => {
-      setTableSectionHeight(calcSectionHeight(southPercent));
-    },
-    [calcSectionHeight],
-  );
-
-  useEffect(() => {
-    recalcPanelSizes(splitSizes);
-  }, [recalcPanelSizes, splitSizes]);
+  // const [setTableSectionHeight] = useState(calcSectionHeight(INITIAL_SIZES[1]));
+  //
+  // const recalcPanelSizes = useCallback(
+  //   ([, southPercent]) => {
+  //     setTableSectionHeight(calcSectionHeight(southPercent));
+  //   },
+  //   [calcSectionHeight],
+  // );
+  //
+  // useEffect(() => {
+  //   recalcPanelSizes(splitSizes);
+  // }, [recalcPanelSizes, splitSizes]);
 
   useEffect(() => {
     setItem(LocalStorageKeys.chart_split_sizes, splitSizes);
@@ -240,19 +240,19 @@ const ExploreChartPanel = props => {
     [chartPanelRef, renderChart],
   );
 
-  const [setQueryFormData] = useState(props.chart.latestQueryFormData);
-
-  useEffect(() => {
-    // only update when `latestQueryFormData` changes AND `triggerRender`
-    // is false. No update should be done when only `triggerRender` changes,
-    // as this can trigger a query downstream based on incomplete form data.
-    // (`latestQueryFormData` is only updated when a a valid request has been
-    // triggered).
-    if (!props.triggerRender) {
-      setQueryFormData(props.chart.latestQueryFormData);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.chart.latestQueryFormData]);
+  // const [setQueryFormData] = useState(props.chart.latestQueryFormData);
+  //
+  // useEffect(() => {
+  //   // only update when `latestQueryFormData` changes AND `triggerRender`
+  //   // is false. No update should be done when only `triggerRender` changes,
+  //   // as this can trigger a query downstream based on incomplete form data.
+  //   // (`latestQueryFormData` is only updated when a a valid request has been
+  //   // triggered).
+  //   if (!props.triggerRender) {
+  //     setQueryFormData(props.chart.latestQueryFormData);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [props.chart.latestQueryFormData]);
 
   if (props.standalone) {
     // dom manipulation hack to get rid of the boostrap theme's body background
