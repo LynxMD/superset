@@ -715,9 +715,6 @@ class SqlEditor extends React.PureComponent {
               saveQueryWarning={this.props.saveQueryWarning}
             />
           </span>
-          <span>
-            <ShareSqlLabQuery queryEditor={qe} />
-          </span>
           <AntdDropdown overlay={this.renderDropdown()} trigger="click">
             <Icons.MoreHoriz iconColor={theme.colors.grayscale.base} />
           </AntdDropdown>
