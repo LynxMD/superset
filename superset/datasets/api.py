@@ -365,6 +365,7 @@ class DatasetRestApi(BaseSupersetModelRestApi):
         log_to_statsd=False,
     )
     def delete(self, pk: int) -> Response:
+        return self.response_403()
         """Deletes a Dataset
         ---
         delete:
@@ -625,6 +626,7 @@ class DatasetRestApi(BaseSupersetModelRestApi):
         log_to_statsd=False,
     )
     def bulk_delete(self, **kwargs: Any) -> Response:
+        return self.response_403()
         """Delete bulk Datasets
         ---
         delete:
