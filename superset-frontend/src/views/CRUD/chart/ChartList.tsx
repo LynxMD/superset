@@ -22,7 +22,7 @@ import {
   SupersetClient,
   t,
 } from '@superset-ui/core';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import rison from 'rison';
 import { uniqBy } from 'lodash';
 import moment from 'moment';
@@ -37,7 +37,6 @@ import {
   useFavoriteStatus,
   useListViewResource,
 } from 'src/views/CRUD/hooks';
-import handleResourceExport from 'src/utils/export';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
 import SubMenu, { SubMenuProps } from 'src/views/components/SubMenu';
 import FaveStar from 'src/components/FaveStar';
@@ -48,11 +47,8 @@ import ListView, {
   ListViewProps,
   SelectOption,
 } from 'src/components/ListView';
-import Loading from 'src/components/Loading';
 import { dangerouslyGetItemDoNotUse } from 'src/utils/localStorageHelpers';
-import withToasts from 'src/components/MessageToasts/withToasts';
 import PropertiesModal from 'src/explore/components/PropertiesModal';
-import ImportModelsModal from 'src/components/ImportModal/index';
 import Chart from 'src/types/Chart';
 import { Tooltip } from 'src/components/Tooltip';
 import Icons from 'src/components/Icons';
@@ -79,19 +75,6 @@ const FlexRowContainer = styled.div`
 `;
 
 const PAGE_SIZE = 25;
-const PASSWORDS_NEEDED_MESSAGE = t(
-  'The passwords for the databases below are needed in order to ' +
-    'import them together with the charts. Please note that the ' +
-    '"Secure Extra" and "Certificate" sections of ' +
-    'the database configuration are not present in export files, and ' +
-    'should be added manually after the import if they are needed.',
-);
-const CONFIRM_OVERWRITE_MESSAGE = t(
-  'You are importing one or more charts that already exist. ' +
-    'Overwriting might cause you to lose some of your work. Are you ' +
-    'sure you want to overwrite?',
-);
-
 setupPlugins();
 const registry = getChartMetadataRegistry();
 
@@ -176,44 +159,16 @@ function ChartList(props: ChartListProps) {
     closeChartEditModal,
   } = useChartEditModal(setCharts, charts);
 
-  const [importingChart, showImportModal] = useState<boolean>(false);
-  const [passwordFields, setPasswordFields] = useState<string[]>([]);
-  const [preparingExport, setPreparingExport] = useState<boolean>(false);
-
   const { userId } = props.user;
   // TODO: Fix usage of localStorage keying on the user id
   const userSettings = dangerouslyGetItemDoNotUse(userId?.toString(), null) as {
     thumbnails: boolean;
   };
 
-  const openChartImportModal = () => {
-    showImportModal(true);
-  };
-
-  const closeChartImportModal = () => {
-    showImportModal(false);
-  };
-
-  const handleChartImport = () => {
-    showImportModal(false);
-    refreshData();
-    addSuccessToast(t('Chart imported'));
-  };
-
   const canCreate = hasPerm('can_write');
   const canEdit = hasPerm('can_write');
   const canDelete = hasPerm('can_write');
-  const canExport =
-    hasPerm('can_export') && isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT);
   const initialSort = [{ id: 'changed_on_delta_humanized', desc: true }];
-
-  const handleBulkChartExport = (chartsToExport: Chart[]) => {
-    const ids = chartsToExport.map(({ id }) => id);
-    handleResourceExport('chart', ids, () => {
-      setPreparingExport(false);
-    });
-    setPreparingExport(true);
-  };
 
   function handleBulkChartDelete(chartsToDelete: Chart[]) {
     SupersetClient.delete({
@@ -372,8 +327,7 @@ function ChartList(props: ChartListProps) {
               refreshData,
             );
           const openEditModal = () => openChartEditModal(original);
-          const handleExport = () => handleBulkChartExport([original]);
-          if (!canEdit && !canDelete && !canExport) {
+          if (!canEdit && !canDelete) {
             return null;
           }
 
@@ -409,22 +363,6 @@ function ChartList(props: ChartListProps) {
                   )}
                 </ConfirmStatusChange>
               )}
-              {canExport && (
-                <Tooltip
-                  id="export-action-tooltip"
-                  title={t('Export')}
-                  placement="bottom"
-                >
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    className="action-button"
-                    onClick={handleExport}
-                  >
-                    <Icons.Share />
-                  </span>
-                </Tooltip>
-              )}
               {canEdit && (
                 <Tooltip
                   id="edit-action-tooltip"
@@ -450,12 +388,7 @@ function ChartList(props: ChartListProps) {
         hidden: !canEdit && !canDelete,
       },
     ],
-    [
-      canEdit,
-      canDelete,
-      canExport,
-      ...(props.user.userId ? [favoriteStatus] : []),
-    ],
+    [canEdit, canDelete, ...(props.user.userId ? [favoriteStatus] : [])],
   );
 
   const favoritesFilter: Filter = useMemo(
@@ -614,19 +547,10 @@ function ChartList(props: ChartListProps) {
         loading={loading}
         favoriteStatus={favoriteStatus[chart.id]}
         saveFavoriteStatus={saveFavoriteStatus}
-        handleBulkChartExport={handleBulkChartExport}
       />
     );
   }
   const subMenuButtons: SubMenuProps['buttons'] = [];
-  if (canDelete || canExport) {
-    subMenuButtons.push({
-      name: t('Bulk select'),
-      buttonStyle: 'secondary',
-      'data-test': 'bulk-select',
-      onClick: toggleBulkSelect,
-    });
-  }
   if (canCreate) {
     subMenuButtons.push({
       name: (
@@ -639,22 +563,6 @@ function ChartList(props: ChartListProps) {
         window.location.assign('/chart/add');
       },
     });
-
-    if (isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT)) {
-      subMenuButtons.push({
-        name: (
-          <Tooltip
-            id="import-tooltip"
-            title={t('Import charts')}
-            placement="bottomRight"
-          >
-            <Icons.Import data-test="import-button" />
-          </Tooltip>
-        ),
-        buttonStyle: 'link',
-        onClick: openChartImportModal,
-      });
-    }
   }
   return (
     <>
@@ -680,14 +588,6 @@ function ChartList(props: ChartListProps) {
               name: t('Delete'),
               type: 'danger',
               onSelect: confirmDelete,
-            });
-          }
-          if (canExport) {
-            bulkActions.push({
-              key: 'export',
-              name: t('Export'),
-              type: 'primary',
-              onSelect: handleBulkChartExport,
             });
           }
           return (
@@ -720,23 +620,8 @@ function ChartList(props: ChartListProps) {
           );
         }}
       </ConfirmStatusChange>
-
-      <ImportModelsModal
-        resourceName="chart"
-        resourceLabel={t('chart')}
-        passwordsNeededMessage={PASSWORDS_NEEDED_MESSAGE}
-        confirmOverwriteMessage={CONFIRM_OVERWRITE_MESSAGE}
-        addDangerToast={addDangerToast}
-        addSuccessToast={addSuccessToast}
-        onModelImport={handleChartImport}
-        show={importingChart}
-        onHide={closeChartImportModal}
-        passwordFields={passwordFields}
-        setPasswordFields={setPasswordFields}
-      />
-      {preparingExport && <Loading />}
     </>
   );
 }
 
-export default withToasts(ChartList);
+export default ChartList;

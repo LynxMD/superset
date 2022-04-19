@@ -28,7 +28,6 @@ import {
 } from 'src/views/CRUD/utils';
 import { useListViewResource, useFavoriteStatus } from 'src/views/CRUD/hooks';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
-import handleResourceExport from 'src/utils/export';
 import Loading from 'src/components/Loading';
 import SubMenu, { SubMenuProps } from 'src/views/components/SubMenu';
 import ListView, {
@@ -45,7 +44,6 @@ import Icons from 'src/components/Icons';
 import FaveStar from 'src/components/FaveStar';
 import PropertiesModal from 'src/dashboard/components/PropertiesModal';
 import { Tooltip } from 'src/components/Tooltip';
-import ImportModelsModal from 'src/components/ImportModal/index';
 
 import Dashboard from 'src/dashboard/containers/Dashboard';
 import CertifiedBadge from 'src/components/CertifiedBadge';
@@ -53,18 +51,6 @@ import DashboardCard from './DashboardCard';
 import { DashboardStatus } from './types';
 
 const PAGE_SIZE = 25;
-const PASSWORDS_NEEDED_MESSAGE = t(
-  'The passwords for the databases below are needed in order to ' +
-    'import them together with the dashboards. Please note that the ' +
-    '"Secure Extra" and "Certificate" sections of ' +
-    'the database configuration are not present in export files, and ' +
-    'should be added manually after the import if they are needed.',
-);
-const CONFIRM_OVERWRITE_MESSAGE = t(
-  'You are importing one or more dashboards that already exist. ' +
-    'Overwriting might cause you to lose some of your work. Are you ' +
-    'sure you want to overwrite?',
-);
 
 interface DashboardListProps {
   addDangerToast: (msg: string) => void;
@@ -125,23 +111,7 @@ function DashboardList(props: DashboardListProps) {
     null,
   );
 
-  const [importingDashboard, showImportModal] = useState<boolean>(false);
-  const [passwordFields, setPasswordFields] = useState<string[]>([]);
-  const [preparingExport, setPreparingExport] = useState<boolean>(false);
-
-  const openDashboardImportModal = () => {
-    showImportModal(true);
-  };
-
-  const closeDashboardImportModal = () => {
-    showImportModal(false);
-  };
-
-  const handleDashboardImport = () => {
-    showImportModal(false);
-    refreshData();
-    addSuccessToast(t('Dashboard imported'));
-  };
+  const [preparingExport] = useState<boolean>(false);
 
   const { userId } = props.user;
   // TODO: Fix usage of localStorage keying on the user id
@@ -150,7 +120,6 @@ function DashboardList(props: DashboardListProps) {
   const canCreate = hasPerm('can_write');
   const canEdit = hasPerm('can_write');
   const canDelete = hasPerm('can_write');
-  const canExport = hasPerm('can_export');
 
   const initialSort = [{ id: 'changed_on_delta_humanized', desc: true }];
 
@@ -203,14 +172,6 @@ function DashboardList(props: DashboardListProps) {
       ),
     );
   }
-
-  const handleBulkDashboardExport = (dashboardsToExport: Dashboard[]) => {
-    const ids = dashboardsToExport.map(({ id }) => id);
-    handleResourceExport('dashboard', ids, () => {
-      setPreparingExport(false);
-    });
-    setPreparingExport(true);
-  };
 
   function handleBulkDashboardDelete(dashboardsToDelete: Dashboard[]) {
     return SupersetClient.delete({
@@ -347,7 +308,6 @@ function DashboardList(props: DashboardListProps) {
               addDangerToast,
             );
           const handleEdit = () => openDashboardEditModal(original);
-          const handleExport = () => handleBulkDashboardExport([original]);
 
           return (
             <Actions className="actions">
@@ -380,22 +340,6 @@ function DashboardList(props: DashboardListProps) {
                   )}
                 </ConfirmStatusChange>
               )}
-              {canExport && (
-                <Tooltip
-                  id="export-action-tooltip"
-                  title={t('Export')}
-                  placement="bottom"
-                >
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    className="action-button"
-                    onClick={handleExport}
-                  >
-                    <Icons.Share />
-                  </span>
-                </Tooltip>
-              )}
               {canEdit && (
                 <Tooltip
                   id="edit-action-tooltip"
@@ -417,16 +361,11 @@ function DashboardList(props: DashboardListProps) {
         },
         Header: t('Actions'),
         id: 'actions',
-        hidden: !canEdit && !canDelete && !canExport,
+        hidden: !canEdit && !canDelete,
         disableSortBy: true,
       },
     ],
-    [
-      canEdit,
-      canDelete,
-      canExport,
-      ...(props.user.userId ? [favoriteStatus] : []),
-    ],
+    [canEdit, canDelete, ...(props.user.userId ? [favoriteStatus] : [])],
   );
 
   const favoritesFilter: Filter = useMemo(
@@ -562,20 +501,11 @@ function DashboardList(props: DashboardListProps) {
         openDashboardEditModal={openDashboardEditModal}
         saveFavoriteStatus={saveFavoriteStatus}
         favoriteStatus={favoriteStatus[dashboard.id]}
-        handleBulkDashboardExport={handleBulkDashboardExport}
       />
     );
   }
 
   const subMenuButtons: SubMenuProps['buttons'] = [];
-  if (canDelete || canExport) {
-    subMenuButtons.push({
-      name: t('Bulk select'),
-      buttonStyle: 'secondary',
-      'data-test': 'bulk-select',
-      onClick: toggleBulkSelect,
-    });
-  }
   if (canCreate) {
     subMenuButtons.push({
       name: (
@@ -588,22 +518,6 @@ function DashboardList(props: DashboardListProps) {
         window.location.assign('/dashboard/new');
       },
     });
-
-    if (isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT)) {
-      subMenuButtons.push({
-        name: (
-          <Tooltip
-            id="import-tooltip"
-            title={t('Import dashboards')}
-            placement="bottomRight"
-          >
-            <Icons.Import data-test="import-button" />
-          </Tooltip>
-        ),
-        buttonStyle: 'link',
-        onClick: openDashboardImportModal,
-      });
-    }
   }
   return (
     <>
@@ -623,14 +537,6 @@ function DashboardList(props: DashboardListProps) {
               name: t('Delete'),
               type: 'danger',
               onSelect: confirmDelete,
-            });
-          }
-          if (canExport) {
-            bulkActions.push({
-              key: 'export',
-              name: t('Export'),
-              type: 'primary',
-              onSelect: handleBulkDashboardExport,
             });
           }
           return (
@@ -674,21 +580,6 @@ function DashboardList(props: DashboardListProps) {
         }}
       </ConfirmStatusChange>
 
-      <ImportModelsModal
-        resourceName="dashboard"
-        resourceLabel={t('dashboard')}
-        passwordsNeededMessage={PASSWORDS_NEEDED_MESSAGE}
-        confirmOverwriteMessage={CONFIRM_OVERWRITE_MESSAGE}
-        addDangerToast={addDangerToast}
-        addSuccessToast={addSuccessToast}
-        onModelImport={handleDashboardImport}
-        show={importingDashboard}
-        onHide={closeDashboardImportModal}
-        passwordFields={passwordFields}
-        setPasswordFields={setPasswordFields}
-      />
-
-      {preparingExport && <Loading />}
     </>
   );
 }
