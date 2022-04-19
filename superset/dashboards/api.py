@@ -704,6 +704,7 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         log_to_statsd=False,
     )  # pylint: disable=too-many-locals
     def export(self, **kwargs: Any) -> Response:
+        return self.response_403()
         """Export dashboards
         ---
         get:
