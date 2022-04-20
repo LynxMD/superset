@@ -28,7 +28,6 @@ import {
 } from 'src/views/CRUD/utils';
 import { useListViewResource, useFavoriteStatus } from 'src/views/CRUD/hooks';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
-import Loading from 'src/components/Loading';
 import SubMenu, { SubMenuProps } from 'src/views/components/SubMenu';
 import ListView, {
   ListViewProps,
@@ -110,8 +109,6 @@ function DashboardList(props: DashboardListProps) {
   const [dashboardToEdit, setDashboardToEdit] = useState<Dashboard | null>(
     null,
   );
-
-  const [preparingExport] = useState<boolean>(false);
 
   const { userId } = props.user;
   // TODO: Fix usage of localStorage keying on the user id
@@ -579,7 +576,6 @@ function DashboardList(props: DashboardListProps) {
           );
         }}
       </ConfirmStatusChange>
-
     </>
   );
 }

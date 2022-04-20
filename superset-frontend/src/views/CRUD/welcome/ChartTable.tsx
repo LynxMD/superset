@@ -38,8 +38,6 @@ import { CardContainer, PAGE_SIZE } from 'src/views/CRUD/utils';
 import { LoadingCards } from 'src/views/CRUD/welcome/Welcome';
 import ChartCard from 'src/views/CRUD/chart/ChartCard';
 import Chart from 'src/types/Chart';
-import handleResourceExport from 'src/utils/export';
-import Loading from 'src/components/Loading';
 import ErrorBoundary from 'src/components/ErrorBoundary';
 import SubMenu from 'src/views/components/SubMenu';
 import EmptyState from './EmptyState';
@@ -103,7 +101,6 @@ function ChartTable({
   } = useChartEditModal(setCharts, charts);
 
   const [chartFilter, setChartFilter] = useState(initialFilter);
-  const [preparingExport, setPreparingExport] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
 
   useEffect(() => {
@@ -112,14 +109,6 @@ function ChartTable({
     }
     setLoaded(true);
   }, [chartFilter]);
-
-  const handleBulkChartExport = (chartsToExport: Chart[]) => {
-    const ids = chartsToExport.map(({ id }) => id);
-    handleResourceExport('chart', ids, () => {
-      setPreparingExport(false);
-    });
-    setPreparingExport(true);
-  };
 
   const getFilters = (filterName: string) => {
     const filters = [];
@@ -248,14 +237,12 @@ function ChartTable({
               addSuccessToast={addSuccessToast}
               favoriteStatus={favoriteStatus[e.id]}
               saveFavoriteStatus={saveFavoriteStatus}
-              handleBulkChartExport={handleBulkChartExport}
             />
           ))}
         </CardContainer>
       ) : (
         <EmptyState tableName={WelcomeTable.Charts} tab={chartFilter} />
       )}
-      {preparingExport && <Loading />}
     </ErrorBoundary>
   );
 }
