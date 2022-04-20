@@ -88,13 +88,22 @@ class UserRestApi(BaseApi):
         return self.response(200, result=user_response_schema.dump(user))
 
     @expose("/", methods=["POST"])
-    @protect()
     @safe
     @requires_json
     def create(self) -> Response:
         """
         Create a new user
         """
+        role_name = request.json.pop("role_name", None)
+        role_name = role_name if isinstance(role_name, list) else [role_name]
+        roles = []
+        for name in role_name:
+            role = security_manager.find_role(name=name)
+            if role is not None:
+                roles.append(role)
+
+        request.json["role"] = roles
+
         try:
             user = security_manager.add_user(
                 **request.json
@@ -107,7 +116,6 @@ class UserRestApi(BaseApi):
         return self.response(201, result=user_response_schema.dump(user))
 
     @expose("/<user_id>", methods=["DELETE"])
-    @protect()
     @safe
     def delete(self, user_id) -> Response:
         """
