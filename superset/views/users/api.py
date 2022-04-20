@@ -132,3 +132,31 @@ class UserRestApi(BaseApi):
             return self.response_401()
 
         return self.response(204)
+
+    @expose("/add_role/<role_name>", methods=["PUT"])
+    @safe
+    @requires_json
+    def add_role(self, role_name) -> Response:
+        """
+        Add role to user
+        """
+        role_name = request.json.pop("role_name", None)
+        role_name = role_name if isinstance(role_name, list) else [role_name]
+        roles = []
+        for name in role_name:
+            role = security_manager.find_role(name=name)
+            if role is not None:
+                roles.append(role)
+
+        request.json["role"] = roles
+
+        try:
+            user = security_manager.add_user(
+                **request.json
+            )
+            if user is False:
+                return self.response_400()
+        except NoAuthorizationError:
+            return self.response_401()
+
+        return self.response(201, result=user_response_schema.dump(user))
