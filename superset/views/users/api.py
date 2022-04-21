@@ -22,6 +22,7 @@ from superset import security_manager
 from flask_jwt_extended.exceptions import NoAuthorizationError
 
 from .schemas import UserResponseSchema
+from .utils import get_or_create_user
 from ..base_api import requires_json
 
 user_response_schema = UserResponseSchema()
@@ -105,9 +106,7 @@ class UserRestApi(BaseApi):
         request.json["role"] = roles
 
         try:
-            user = security_manager.add_user(
-                **request.json
-            )
+            user = get_or_create_user(request.json)
             if user is False:
                 return self.response_400()
         except NoAuthorizationError:
