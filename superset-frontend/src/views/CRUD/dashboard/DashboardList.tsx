@@ -241,12 +241,9 @@ function DashboardList(props: DashboardListProps) {
       {
         Cell: ({
           row: {
-            original: {
-              changed_by_name: changedByName,
-              changed_by_url: changedByUrl,
-            },
+            original: { changed_by_name: changedByName },
           },
-        }: any) => <a href={changedByUrl}>{changedByName}</a>,
+        }: any) => `${changedByName}`,
         Header: t('Modified by'),
         accessor: 'changed_by.first_name',
         size: 'xl',
