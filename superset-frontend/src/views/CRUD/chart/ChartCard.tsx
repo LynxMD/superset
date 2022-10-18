@@ -45,7 +45,6 @@ interface ChartCardProps {
   chartFilter?: string;
   userId?: number;
   showThumbnails?: boolean;
-  handleBulkChartExport: (chartsToExport: Chart[]) => void;
 }
 
 export default function ChartCard({
@@ -62,12 +61,9 @@ export default function ChartCard({
   favoriteStatus,
   chartFilter,
   userId,
-  handleBulkChartExport,
 }: ChartCardProps) {
   const canEdit = hasPerm('can_write');
   const canDelete = hasPerm('can_write');
-  const canExport =
-    hasPerm('can_export') && isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT);
   const theme = useTheme();
 
   const menu = (
@@ -105,17 +101,6 @@ export default function ChartCard({
               </div>
             )}
           </ConfirmStatusChange>
-        </Menu.Item>
-      )}
-      {canExport && (
-        <Menu.Item>
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => handleBulkChartExport([chart])}
-          >
-            <Icons.Share iconSize="l" /> {t('Export')}
-          </div>
         </Menu.Item>
       )}
       {canEdit && (

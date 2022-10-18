@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ensureIsArray,
   GenericDataType,
@@ -37,23 +37,19 @@ import {
   LocalStorageKeys,
 } from 'src/utils/localStorageHelpers';
 import {
-  CopyToClipboardButton,
   FilterInput,
   RowCount,
   useFilteredTableData,
   useTableColumns,
 } from 'src/explore/components/DataTableControl';
-import { applyFormattingToTabularData } from 'src/utils/common';
 import { useTimeFormattedColumns } from '../useTimeFormattedColumns';
 
 const RESULT_TYPES = {
   results: 'results' as const,
-  samples: 'samples' as const,
 };
 
 const getDefaultDataTablesState = (value: any) => ({
   [RESULT_TYPES.results]: value,
-  [RESULT_TYPES.samples]: value,
 });
 
 const DATA_TABLE_PAGE_SIZE = 50;
@@ -222,20 +218,6 @@ export const DataTablesPane = ({
     queryFormData?.datasource,
   );
 
-  const formattedData = useMemo(
-    () => ({
-      [RESULT_TYPES.results]: applyFormattingToTabularData(
-        data[RESULT_TYPES.results],
-        timeFormattedColumns,
-      ),
-      [RESULT_TYPES.samples]: applyFormattingToTabularData(
-        data[RESULT_TYPES.samples],
-        timeFormattedColumns,
-      ),
-    }),
-    [data, timeFormattedColumns],
-  );
-
   const getData = useCallback(
     (resultType: 'samples' | 'results') => {
       setIsLoading(prevIsLoading => ({
@@ -319,13 +301,6 @@ export const DataTablesPane = ({
   }, [queryFormData]);
 
   useEffect(() => {
-    setIsRequestPending(prevState => ({
-      ...prevState,
-      [RESULT_TYPES.samples]: true,
-    }));
-  }, [queryFormData?.datasource]);
-
-  useEffect(() => {
     if (queriesResponse && chartStatus === 'success') {
       const { colnames } = queriesResponse[0];
       setColumnNames(prevColumnNames => ({
@@ -361,17 +336,6 @@ export const DataTablesPane = ({
         getData(RESULT_TYPES.results);
       }
     }
-    if (
-      panelOpen &&
-      isRequestPending[RESULT_TYPES.samples] &&
-      activeTabKey === RESULT_TYPES.samples
-    ) {
-      setIsRequestPending(prevState => ({
-        ...prevState,
-        [RESULT_TYPES.samples]: false,
-      }));
-      getData(RESULT_TYPES.samples);
-    }
   }, [
     panelOpen,
     isRequestPending,
@@ -384,10 +348,6 @@ export const DataTablesPane = ({
   const TableControls = (
     <TableControlsWrapper>
       <RowCount data={data[activeTabKey]} loading={isLoading[activeTabKey]} />
-      <CopyToClipboardButton
-        data={formattedData[activeTabKey]}
-        columns={columnNames[activeTabKey]}
-      />
       <FilterInput onChangeHandler={setFilterText} />
     </TableControlsWrapper>
   );
@@ -432,23 +392,6 @@ export const DataTablesPane = ({
                     error={error[RESULT_TYPES.results]}
                     errorMessage={errorMessage}
                     type={RESULT_TYPES.results}
-                  />
-                </Tabs.TabPane>
-                <Tabs.TabPane
-                  tab={t('View samples')}
-                  key={RESULT_TYPES.samples}
-                >
-                  <DataTable
-                    isLoading={isLoading[RESULT_TYPES.samples]}
-                    data={data[RESULT_TYPES.samples]}
-                    datasource={queryFormData?.datasource}
-                    timeFormattedColumns={timeFormattedColumns}
-                    columnNames={columnNames[RESULT_TYPES.samples]}
-                    columnTypes={columnTypes[RESULT_TYPES.samples]}
-                    filterText={filterText}
-                    error={error[RESULT_TYPES.samples]}
-                    errorMessage={errorMessage}
-                    type={RESULT_TYPES.samples}
                   />
                 </Tabs.TabPane>
               </Tabs>

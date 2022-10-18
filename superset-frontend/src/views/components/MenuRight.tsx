@@ -77,7 +77,6 @@ const RightMenu = ({
     COLUMNAR_EXTENSIONS,
     EXCEL_EXTENSIONS,
     ALLOWED_EXTENSIONS,
-    HAS_GSHEETS_INSTALLED,
   } = useSelector<any, ExtentionConfigs>(state => state.common.conf);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [engine, setEngine] = useState<string>('');
@@ -97,40 +96,6 @@ const RightMenu = ({
   const canUpload = canUploadCSV || canUploadColumnar || canUploadExcel;
   const showActionDropdown = canSql || canChart || canDashboard;
   const dropdownItems: MenuObjectProps[] = [
-    {
-      label: t('Data'),
-      icon: 'fa-database',
-      childs: [
-        {
-          label: t('Connect database'),
-          name: GlobalMenuDataOptions.DB_CONNECTION,
-          perm: canDatabase,
-        },
-        {
-          label: t('Connect Google Sheet'),
-          name: GlobalMenuDataOptions.GOOGLE_SHEETS,
-          perm: canDatabase && HAS_GSHEETS_INSTALLED,
-        },
-        {
-          label: t('Upload CSV to database'),
-          name: 'Upload a CSV',
-          url: '/csvtodatabaseview/form',
-          perm: canUploadCSV,
-        },
-        {
-          label: t('Upload columnar file to database'),
-          name: 'Upload a Columnar file',
-          url: '/columnartodatabaseview/form',
-          perm: canUploadColumnar,
-        },
-        {
-          label: t('Upload Excel file to database'),
-          name: 'Upload Excel',
-          url: '/exceltodatabaseview/form',
-          perm: canUploadExcel,
-        },
-      ],
-    },
     {
       label: t('SQL query'),
       url: '/superset/sqllab?new=true',
@@ -169,6 +134,8 @@ const RightMenu = ({
       setEngine('Google Sheets');
     }
   };
+
+  const hasAdminPermissions = () => 'Admin' in roles;
 
   const handleOnHideModal = () => {
     setEngine('');
@@ -236,78 +203,80 @@ const RightMenu = ({
             })}
           </SubMenu>
         )}
-        <SubMenu
-          title={t('Settings')}
-          icon={<Icons.TriangleDown iconSize="xl" />}
-        >
-          {settings.map((section, index) => [
-            <Menu.ItemGroup key={`${section.label}`} title={section.label}>
-              {section.childs?.map(child => {
-                if (typeof child !== 'string') {
-                  return (
-                    <Menu.Item key={`${child.label}`}>
-                      {isFrontendRoute(child.url) ? (
-                        <Link to={child.url || ''}>{child.label}</Link>
-                      ) : (
-                        <a href={child.url}>{child.label}</a>
-                      )}
-                    </Menu.Item>
-                  );
-                }
-                return null;
-              })}
-            </Menu.ItemGroup>,
-            index < settings.length - 1 && (
-              <Menu.Divider key={`divider_${index}`} />
-            ),
-          ])}
+        {hasAdminPermissions() ? (
+          <SubMenu
+            title={t('Settings')}
+            icon={<Icons.TriangleDown iconSize="xl" />}
+          >
+            {settings.map((section, index) => [
+              <Menu.ItemGroup key={`${section.label}`} title={section.label}>
+                {section.childs?.map(child => {
+                  if (typeof child !== 'string') {
+                    return (
+                      <Menu.Item key={`${child.label}`}>
+                        {isFrontendRoute(child.url) ? (
+                          <Link to={child.url || ''}>{child.label}</Link>
+                        ) : (
+                          <a href={child.url}>{child.label}</a>
+                        )}
+                      </Menu.Item>
+                    );
+                  }
+                  return null;
+                })}
+              </Menu.ItemGroup>,
+              index < settings.length - 1 && (
+                <Menu.Divider key={`divider_${index}`} />
+              ),
+            ])}
 
-          {!navbarRight.user_is_anonymous && [
-            <Menu.Divider key="user-divider" />,
-            <Menu.ItemGroup key="user-section" title={t('User')}>
-              {navbarRight.user_profile_url && (
-                <Menu.Item key="profile">
-                  <a href={navbarRight.user_profile_url}>{t('Profile')}</a>
+            {!navbarRight.user_is_anonymous && [
+              <Menu.Divider key="user-divider" />,
+              <Menu.ItemGroup key="user-section" title={t('User')}>
+                {navbarRight.user_profile_url && (
+                  <Menu.Item key="profile">
+                    <a href={navbarRight.user_profile_url}>{t('Profile')}</a>
+                  </Menu.Item>
+                )}
+                {navbarRight.user_info_url && (
+                  <Menu.Item key="info">
+                    <a href={navbarRight.user_info_url}>{t('Info')}</a>
+                  </Menu.Item>
+                )}
+                <Menu.Item key="logout">
+                  <a href={navbarRight.user_logout_url}>{t('Logout')}</a>
                 </Menu.Item>
-              )}
-              {navbarRight.user_info_url && (
-                <Menu.Item key="info">
-                  <a href={navbarRight.user_info_url}>{t('Info')}</a>
-                </Menu.Item>
-              )}
-              <Menu.Item key="logout">
-                <a href={navbarRight.user_logout_url}>{t('Logout')}</a>
-              </Menu.Item>
-            </Menu.ItemGroup>,
-          ]}
-          {(navbarRight.version_string || navbarRight.version_sha) && [
-            <Menu.Divider key="version-info-divider" />,
-            <Menu.ItemGroup key="about-section" title={t('About')}>
-              <div className="about-section">
-                {navbarRight.show_watermark && (
-                  <div css={versionInfoStyles}>
-                    {t('Powered by Apache Superset')}
-                  </div>
-                )}
-                {navbarRight.version_string && (
-                  <div css={versionInfoStyles}>
-                    Version: {navbarRight.version_string}
-                  </div>
-                )}
-                {navbarRight.version_sha && (
-                  <div css={versionInfoStyles}>
-                    SHA: {navbarRight.version_sha}
-                  </div>
-                )}
-                {navbarRight.build_number && (
-                  <div css={versionInfoStyles}>
-                    Build: {navbarRight.build_number}
-                  </div>
-                )}
-              </div>
-            </Menu.ItemGroup>,
-          ]}
-        </SubMenu>
+              </Menu.ItemGroup>,
+            ]}
+            {(navbarRight.version_string || navbarRight.version_sha) && [
+              <Menu.Divider key="version-info-divider" />,
+              <Menu.ItemGroup key="about-section" title={t('About')}>
+                <div className="about-section">
+                  {navbarRight.show_watermark && (
+                    <div css={versionInfoStyles}>
+                      {t('Powered by Apache Superset')}
+                    </div>
+                  )}
+                  {navbarRight.version_string && (
+                    <div css={versionInfoStyles}>
+                      Version: {navbarRight.version_string}
+                    </div>
+                  )}
+                  {navbarRight.version_sha && (
+                    <div css={versionInfoStyles}>
+                      SHA: {navbarRight.version_sha}
+                    </div>
+                  )}
+                  {navbarRight.build_number && (
+                    <div css={versionInfoStyles}>
+                      Build: {navbarRight.build_number}
+                    </div>
+                  )}
+                </div>
+              </Menu.ItemGroup>,
+            ]}
+          </SubMenu>
+        ) : null}
         {navbarRight.show_language_picker && (
           <LanguagePicker
             locale={navbarRight.locale}

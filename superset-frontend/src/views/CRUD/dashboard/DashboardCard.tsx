@@ -46,7 +46,6 @@ interface DashboardCardProps {
   dashboardFilter?: string;
   userId?: number;
   showThumbnails?: boolean;
-  handleBulkDashboardExport: (dashboardsToExport: Dashboard[]) => void;
 }
 
 function DashboardCard({
@@ -62,12 +61,10 @@ function DashboardCard({
   favoriteStatus,
   saveFavoriteStatus,
   showThumbnails,
-  handleBulkDashboardExport,
 }: DashboardCardProps) {
   const history = useHistory();
   const canEdit = hasPerm('can_write');
   const canDelete = hasPerm('can_write');
-  const canExport = hasPerm('can_export');
 
   const theme = useTheme();
   const menu = (
@@ -84,19 +81,6 @@ function DashboardCard({
             data-test="dashboard-card-option-edit-button"
           >
             <Icons.EditAlt iconSize="l" data-test="edit-alt" /> {t('Edit')}
-          </div>
-        </Menu.Item>
-      )}
-      {canExport && (
-        <Menu.Item>
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => handleBulkDashboardExport([dashboard])}
-            className="action-button"
-            data-test="dashboard-card-option-export-button"
-          >
-            <Icons.Share iconSize="l" /> {t('Export')}
           </div>
         </Menu.Item>
       )}

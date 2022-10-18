@@ -25,7 +25,6 @@ import {
   DashboardTableProps,
   TableTabTypes,
 } from 'src/views/CRUD/types';
-import handleResourceExport from 'src/utils/export';
 import { useHistory } from 'react-router-dom';
 import {
   getItem,
@@ -39,7 +38,6 @@ import {
   PAGE_SIZE,
 } from 'src/views/CRUD/utils';
 import withToasts from 'src/components/MessageToasts/withToasts';
-import Loading from 'src/components/Loading';
 import PropertiesModal from 'src/dashboard/components/PropertiesModal';
 import DashboardCard from 'src/views/CRUD/dashboard/DashboardCard';
 import SubMenu from 'src/views/components/SubMenu';
@@ -93,7 +91,6 @@ function DashboardTable({
 
   const [editModal, setEditModal] = useState<Dashboard>();
   const [dashboardFilter, setDashboardFilter] = useState(defaultFilter);
-  const [preparingExport, setPreparingExport] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
 
   useEffect(() => {
@@ -102,14 +99,6 @@ function DashboardTable({
     }
     setLoaded(true);
   }, [dashboardFilter]);
-
-  const handleBulkDashboardExport = (dashboardsToExport: Dashboard[]) => {
-    const ids = dashboardsToExport.map(({ id }) => id);
-    handleResourceExport('dashboard', ids, () => {
-      setPreparingExport(false);
-    });
-    setPreparingExport(true);
-  };
 
   const handleDashboardEdit = (edits: Dashboard) =>
     SupersetClient.get({
@@ -267,7 +256,6 @@ function DashboardTable({
               }
               saveFavoriteStatus={saveFavoriteStatus}
               favoriteStatus={favoriteStatus[e.id]}
-              handleBulkDashboardExport={handleBulkDashboardExport}
             />
           ))}
         </CardContainer>
@@ -275,7 +263,6 @@ function DashboardTable({
       {dashboards.length === 0 && (
         <EmptyState tableName={WelcomeTable.Dashboards} tab={dashboardFilter} />
       )}
-      {preparingExport && <Loading />}
     </>
   );
 }

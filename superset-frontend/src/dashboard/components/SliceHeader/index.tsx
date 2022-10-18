@@ -59,7 +59,6 @@ const SliceHeader: FC<SliceHeaderProps> = ({
   toggleExpandSlice = () => ({}),
   logExploreChart = () => ({}),
   onExploreChart,
-  exportCSV = () => ({}),
   editMode = false,
   annotationQuery = {},
   annotationError = {},
@@ -69,10 +68,7 @@ const SliceHeader: FC<SliceHeaderProps> = ({
   isExpanded = false,
   sliceName = '',
   supersetCanExplore = false,
-  supersetCanShare = false,
-  supersetCanCSV = false,
   sliceCanEdit = false,
-  exportFullCSV,
   slice,
   componentId,
   dashboardId,
@@ -172,11 +168,7 @@ const SliceHeader: FC<SliceHeaderProps> = ({
                 forceRefresh={forceRefresh}
                 logExploreChart={logExploreChart}
                 onExploreChart={onExploreChart}
-                exportCSV={exportCSV}
-                exportFullCSV={exportFullCSV}
                 supersetCanExplore={supersetCanExplore}
-                supersetCanShare={supersetCanShare}
-                supersetCanCSV={supersetCanCSV}
                 sliceCanEdit={sliceCanEdit}
                 componentId={componentId}
                 dashboardId={dashboardId}

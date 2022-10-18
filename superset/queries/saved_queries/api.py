@@ -212,6 +212,7 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
     @statsd_metrics
     @rison(get_export_ids_schema)
     def export(self, **kwargs: Any) -> Response:
+        return self.response_403()
         """Export saved queries
         ---
         get:

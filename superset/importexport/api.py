@@ -48,6 +48,7 @@ class ImportExportRestApi(BaseApi):
         log_to_statsd=False,
     )
     def export(self) -> Response:
+        return self.response_403()
         """
         Export all assets.
         ---

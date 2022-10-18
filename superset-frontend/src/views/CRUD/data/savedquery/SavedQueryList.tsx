@@ -46,7 +46,6 @@ import ActionsBar, { ActionProps } from 'src/components/ListView/ActionsBar';
 import { Tooltip } from 'src/components/Tooltip';
 import { commonMenuData } from 'src/views/CRUD/data/common';
 import { SavedQueryObject } from 'src/views/CRUD/types';
-import copyTextToClipboard from 'src/utils/copy';
 import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
 import ImportModelsModal from 'src/components/ImportModal/index';
 import Icons from 'src/components/Icons';
@@ -137,7 +136,7 @@ function SavedQueryList({
     hasPerm('can_export') && isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT);
 
   const openNewQuery = () => {
-    window.open(`${window.location.origin}/superset/sqllab?new=true`);
+    window.location.href = `${window.location.origin}/superset/sqllab?new=true`;
   };
 
   const handleSavedQueryPreview = useCallback(
@@ -205,23 +204,8 @@ function SavedQueryList({
 
   // Action methods
   const openInSqlLab = (id: number) => {
-    window.open(`${window.location.origin}/superset/sqllab?savedQueryId=${id}`);
+    window.location.href = `${window.location.origin}/superset/sqllab?savedQueryId=${id}`;
   };
-
-  const copyQueryLink = useCallback(
-    (id: number) => {
-      copyTextToClipboard(
-        `${window.location.origin}/superset/sqllab?savedQueryId=${id}`,
-      )
-        .then(() => {
-          addSuccessToast(t('Link Copied!'));
-        })
-        .catch(() => {
-          addDangerToast(t('Sorry, your browser does not support copying.'));
-        });
-    },
-    [addDangerToast, addSuccessToast],
-  );
 
   const handleQueryDelete = ({ id, label }: SavedQueryObject) => {
     SupersetClient.delete({
@@ -367,8 +351,6 @@ function SavedQueryList({
             handleSavedQueryPreview(original.id);
           };
           const handleEdit = () => openInSqlLab(original.id);
-          const handleCopy = () => copyQueryLink(original.id);
-          const handleExport = () => handleBulkSavedQueryExport([original]);
           const handleDelete = () => setQueryCurrentlyDeleting(original);
 
           const actions = [
@@ -386,20 +368,6 @@ function SavedQueryList({
               icon: 'Edit',
               onClick: handleEdit,
             },
-            {
-              label: 'copy-action',
-              tooltip: t('Copy query URL'),
-              placement: 'bottom',
-              icon: 'Copy',
-              onClick: handleCopy,
-            },
-            canExport && {
-              label: 'export-action',
-              tooltip: t('Export query'),
-              placement: 'bottom',
-              icon: 'Share',
-              onClick: handleExport,
-            },
             canDelete && {
               label: 'delete-action',
               tooltip: t('Delete query'),
@@ -416,7 +384,7 @@ function SavedQueryList({
         disableSortBy: true,
       },
     ],
-    [canDelete, canEdit, canExport, copyQueryLink, handleSavedQueryPreview],
+    [canDelete, canEdit, handleSavedQueryPreview],
   );
 
   const filters: Filters = useMemo(

@@ -14,11 +14,16 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-from flask import g, Response
+from flask import g, Response, request
 from flask_appbuilder.api import BaseApi, expose, safe
+from flask_appbuilder.security.decorators import protect
+
+from superset import security_manager
 from flask_jwt_extended.exceptions import NoAuthorizationError
 
 from .schemas import UserResponseSchema
+from .utils import get_or_create_user
+from ..base_api import requires_json
 
 user_response_schema = UserResponseSchema()
 
@@ -59,3 +64,98 @@ class CurrentUserRestApi(BaseApi):
             return self.response_401()
 
         return self.response(200, result=user_response_schema.dump(g.user))
+
+
+class UserRestApi(BaseApi):
+    """ An api to get information about the current user """
+
+    resource_name = "user"
+    openapi_spec_tag = "User"
+    openapi_spec_component_schemas = (UserResponseSchema,)
+
+    @expose("/<email>", methods=["GET"])
+    @safe
+    def get_by_email(self, email: int) -> Response:
+        """
+        Get the user object by email
+        """
+        try:
+            user = security_manager.find_user(email=email)
+            if user is None:
+                return self.response_401()
+        except NoAuthorizationError:
+            return self.response_401()
+
+        return self.response(200, result=user_response_schema.dump(user))
+
+    @expose("/", methods=["POST"])
+    @safe
+    @requires_json
+    def create(self) -> Response:
+        """
+        Create a new user
+        """
+        role_name = request.json.pop("role_name", None)
+        role_name = role_name if isinstance(role_name, list) else [role_name]
+        roles = []
+        for name in role_name:
+            role = security_manager.find_role(name=name)
+            if role is not None:
+                roles.append(role)
+
+        request.json["role"] = roles
+
+        try:
+            user = get_or_create_user(request.json)
+            if user is False:
+                return self.response_400()
+        except NoAuthorizationError:
+            return self.response_401()
+
+        return self.response(201, result=user_response_schema.dump(user))
+
+    @expose("/<user_id>", methods=["DELETE"])
+    @safe
+    def delete(self, user_id) -> Response:
+        """
+        Delete user
+        """
+        try:
+            user = security_manager.get_user_by_id(user_id)
+            if not user:
+                return self.response_404()
+            is_deleted = security_manager.del_register_user(user)
+            if not is_deleted:
+                return self.response_500("Failed to delete user")
+        except NoAuthorizationError:
+            return self.response_401()
+
+        return self.response(204)
+
+    @expose("/add_role/<role_name>", methods=["PUT"])
+    @safe
+    @requires_json
+    def add_role(self, role_name) -> Response:
+        """
+        Add role to user
+        """
+        role_name = request.json.pop("role_name", None)
+        role_name = role_name if isinstance(role_name, list) else [role_name]
+        roles = []
+        for name in role_name:
+            role = security_manager.find_role(name=name)
+            if role is not None:
+                roles.append(role)
+
+        request.json["role"] = roles
+
+        try:
+            user = security_manager.add_user(
+                **request.json
+            )
+            if user is False:
+                return self.response_400()
+        except NoAuthorizationError:
+            return self.response_401()
+
+        return self.response(201, result=user_response_schema.dump(user))

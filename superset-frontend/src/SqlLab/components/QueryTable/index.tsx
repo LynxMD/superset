@@ -57,8 +57,7 @@ interface QueryTableProps {
 }
 
 const openQuery = (id: number) => {
-  const url = `/superset/sqllab?queryId=${id}`;
-  window.open(url);
+  window.location.href = `/superset/sqllab?queryId=${id}`;
 };
 
 const QueryTable = ({

@@ -20,7 +20,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
-import Icons from 'src/components/Icons';
 import {
   CategoricalColorNamespace,
   SupersetClient,
@@ -28,14 +27,11 @@ import {
   t,
 } from '@superset-ui/core';
 import { Tooltip } from 'src/components/Tooltip';
-import ReportModal from 'src/components/ReportModal';
 import {
   fetchUISpecificReport,
   toggleActive,
   deleteActiveReport,
 } from 'src/reports/actions/reports';
-import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
-import HeaderReportActionsDropdown from 'src/components/ReportModal/HeaderReportActionsDropdown';
 import { chartPropShape } from 'src/dashboard/util/propShapes';
 import EditableTitle from 'src/components/EditableTitle';
 import AlteredSliceTag from 'src/components/AlteredSliceTag';
@@ -45,7 +41,6 @@ import CachedLabel from 'src/components/CachedLabel';
 import PropertiesModal from 'src/explore/components/PropertiesModal';
 import { sliceUpdated } from 'src/explore/actions/exploreActions';
 import CertifiedBadge from 'src/components/CertifiedBadge';
-import ExploreActionButtons from '../ExploreActionButtons';
 import RowCountLabel from '../RowCountLabel';
 
 const CHART_STATUS_MAP = {
@@ -57,7 +52,6 @@ const CHART_STATUS_MAP = {
 const propTypes = {
   actions: PropTypes.object.isRequired,
   can_overwrite: PropTypes.bool.isRequired,
-  can_download: PropTypes.bool.isRequired,
   dashboardId: PropTypes.number,
   isStarred: PropTypes.bool.isRequired,
   slice: PropTypes.object,
@@ -113,28 +107,14 @@ export class ExploreChartHeader extends React.PureComponent {
     super(props);
     this.state = {
       isPropertiesModalOpen: false,
-      showingReportModal: false,
     };
     this.openPropertiesModal = this.openPropertiesModal.bind(this);
     this.closePropertiesModal = this.closePropertiesModal.bind(this);
-    this.showReportModal = this.showReportModal.bind(this);
-    this.hideReportModal = this.hideReportModal.bind(this);
-    this.renderReportModal = this.renderReportModal.bind(this);
     this.fetchChartDashboardData = this.fetchChartDashboardData.bind(this);
   }
 
   componentDidMount() {
     const { dashboardId } = this.props;
-    if (this.canAddReports()) {
-      const { user, chart } = this.props;
-      // this is in the case that there is an anonymous user.
-      this.props.fetchUISpecificReport(
-        user.userId,
-        'chart_id',
-        'charts',
-        chart.id,
-      );
-    }
     if (dashboardId) {
       this.fetchChartDashboardData();
     }
@@ -182,9 +162,7 @@ export class ExploreChartHeader extends React.PureComponent {
 
   getSliceName() {
     const { sliceName, table_name: tableName } = this.props;
-    const title = sliceName || t('%s - untitled', tableName);
-
-    return title;
+    return sliceName || t('%s - untitled', tableName);
   }
 
   postChartFormData() {
@@ -209,63 +187,12 @@ export class ExploreChartHeader extends React.PureComponent {
     });
   }
 
-  showReportModal() {
-    this.setState({ showingReportModal: true });
-  }
-
-  hideReportModal() {
-    this.setState({ showingReportModal: false });
-  }
-
-  renderReportModal() {
-    const attachedReportExists = !!Object.keys(this.props.reports).length;
-    return attachedReportExists ? (
-      <HeaderReportActionsDropdown
-        showReportModal={this.showReportModal}
-        hideReportModal={this.hideReportModal}
-        toggleActive={this.props.toggleActive}
-        deleteActiveReport={this.props.deleteActiveReport}
-      />
-    ) : (
-      <>
-        <span
-          role="button"
-          title={t('Schedule email report')}
-          tabIndex={0}
-          className="action-button"
-          onClick={this.showReportModal}
-        >
-          <Icons.Calendar />
-        </span>
-      </>
-    );
-  }
-
-  canAddReports() {
-    if (!isFeatureEnabled(FeatureFlag.ALERT_REPORTS)) {
-      return false;
-    }
-    const { user } = this.props;
-    if (!user?.userId) {
-      // this is in the case that there is an anonymous user.
-      return false;
-    }
-    const roles = Object.keys(user.roles || []);
-    const permissions = roles.map(key =>
-      user.roles[key].filter(
-        perms => perms[0] === 'menu_access' && perms[1] === 'Manage',
-      ),
-    );
-    return permissions[0].length > 0;
-  }
-
   render() {
     const { user, form_data: formData, slice } = this.props;
     const {
       chartStatus,
       chartUpdateEndTime,
       chartUpdateStartTime,
-      latestQueryFormData,
       queriesResponse,
     } = this.props.chart;
     // TODO: when will get appropriate design for multi queries use all results and not first only
@@ -357,28 +284,6 @@ export class ExploreChartHeader extends React.PureComponent {
             endTime={chartUpdateEndTime}
             isRunning={chartStatus === 'loading'}
             status={CHART_STATUS_MAP[chartStatus]}
-          />
-          {this.canAddReports() && this.renderReportModal()}
-          <ReportModal
-            show={this.state.showingReportModal}
-            onHide={this.hideReportModal}
-            props={{
-              userId: this.props.user.userId,
-              userEmail: this.props.user.email,
-              chart: this.props.chart,
-              creationMethod: 'charts',
-            }}
-          />
-          <ExploreActionButtons
-            actions={{
-              ...this.props.actions,
-              openPropertiesModal: this.openPropertiesModal,
-            }}
-            slice={this.props.slice}
-            canDownloadCSV={this.props.can_download}
-            chartStatus={chartStatus}
-            latestQueryFormData={latestQueryFormData}
-            queryResponse={queryResponse}
           />
         </div>
       </StyledHeader>

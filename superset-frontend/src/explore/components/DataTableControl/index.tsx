@@ -40,10 +40,7 @@ import {
 } from 'src/constants';
 import { Radio } from 'src/components/Radio';
 import Icons from 'src/components/Icons';
-import Button from 'src/components/Button';
 import Popover from 'src/components/Popover';
-import { prepareCopyToClipboardTabularData } from 'src/utils/common';
-import CopyToClipboard from 'src/components/CopyToClipboard';
 import RowCountLabel from 'src/explore/components/RowCountLabel';
 import {
   setTimeFormattedColumn,
@@ -53,41 +50,6 @@ import {
 export const CellNull = styled('span')`
   color: ${({ theme }) => theme.colors.grayscale.light1};
 `;
-
-export const CopyButton = styled(Button)`
-  font-size: ${({ theme }) => theme.typography.sizes.s}px;
-
-  // needed to override button's first-of-type margin: 0
-  && {
-    margin: 0 ${({ theme }) => theme.gridUnit * 2}px;
-  }
-
-  i {
-    padding: 0 ${({ theme }) => theme.gridUnit}px;
-  }
-`;
-
-const CopyNode = (
-  <CopyButton buttonSize="xsmall" aria-label={t('Copy')}>
-    <i className="fa fa-clipboard" />
-  </CopyButton>
-);
-
-export const CopyToClipboardButton = ({
-  data,
-  columns,
-}: {
-  data?: Record<string, any>;
-  columns?: string[];
-}) => (
-  <CopyToClipboard
-    text={
-      data && columns ? prepareCopyToClipboardTabularData(data, columns) : ''
-    }
-    wrapped={false}
-    copyNode={CopyNode}
-  />
-);
 
 export const FilterInput = ({
   onChangeHandler,

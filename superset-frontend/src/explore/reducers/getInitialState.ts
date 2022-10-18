@@ -39,7 +39,6 @@ import { getItem, LocalStorageKeys } from 'src/utils/localStorageHelpers';
 
 export interface ExplorePageBootstrapData extends JsonObject {
   can_add: boolean;
-  can_download: boolean;
   can_overwrite: boolean;
   common: CommonBootstrapData;
   datasource: DatasourceMeta;

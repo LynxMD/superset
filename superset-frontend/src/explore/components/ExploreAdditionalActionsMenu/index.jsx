@@ -23,7 +23,6 @@ import PropTypes from 'prop-types';
 import { t } from '@superset-ui/core';
 import { AntdDropdown } from 'src/components';
 import { Menu } from 'src/components/Menu';
-import downloadAsImage from 'src/utils/downloadAsImage';
 import ModalTrigger from 'src/components/ModalTrigger';
 import { sliceUpdated } from 'src/explore/actions/exploreActions';
 import ViewQueryModal from '../controls/ViewQueryModal';
@@ -39,30 +38,20 @@ const propTypes = {
 const MENU_KEYS = {
   EDIT_PROPERTIES: 'edit_properties',
   RUN_IN_SQL_LAB: 'run_in_sql_lab',
-  DOWNLOAD_AS_IMAGE: 'download_as_image',
   VIEW_QUERY: 'view_query',
 };
 
 const ExploreAdditionalActionsMenu = props => {
   const { datasource } = props.latestQueryFormData;
   const sqlSupported = datasource && datasource.split('__')[1] === 'table';
-  const handleMenuClick = ({ key, domEvent }) => {
-    const { slice, onOpenInEditor, latestQueryFormData } = props;
+  const handleMenuClick = ({ key }) => {
+    const { onOpenInEditor, latestQueryFormData } = props;
     switch (key) {
       case MENU_KEYS.EDIT_PROPERTIES:
         props.onOpenPropertiesModal();
         break;
       case MENU_KEYS.RUN_IN_SQL_LAB:
         onOpenInEditor(latestQueryFormData);
-        break;
-      case MENU_KEYS.DOWNLOAD_AS_IMAGE:
-        downloadAsImage(
-          '.panel-body > .chart-container',
-          // eslint-disable-next-line camelcase
-          slice?.slice_name ?? t('New chart'),
-          {},
-          true,
-        )(domEvent);
         break;
       default:
         break;

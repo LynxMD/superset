@@ -59,6 +59,7 @@ if feature_flags.get("VERSIONED_EXPORT"):
         "--dashboard-file", "-f", help="Specify the the file to export to",
     )
     def export_dashboards(dashboard_file: Optional[str] = None) -> None:
+        return
         """Export dashboards to ZIP file"""
         # pylint: disable=import-outside-toplevel
         from superset.dashboards.commands.export import ExportDashboardsCommand
@@ -93,6 +94,7 @@ if feature_flags.get("VERSIONED_EXPORT"):
         "--datasource-file", "-f", help="Specify the the file to export to",
     )
     def export_datasources(datasource_file: Optional[str] = None) -> None:
+        return
         """Export datasources to ZIP file"""
         # pylint: disable=import-outside-toplevel
         from superset.connectors.sqla.models import SqlaTable
@@ -206,6 +208,7 @@ else:
     def export_dashboards(
         dashboard_file: Optional[str], print_stdout: bool = False
     ) -> None:
+        return
         """Export dashboards to JSON"""
         # pylint: disable=import-outside-toplevel
         from superset.utils import dashboard_import_export
@@ -253,6 +256,7 @@ else:
         back_references: bool = False,
         include_defaults: bool = False,
     ) -> None:
+        return
         """Export datasources to YAML"""
         # pylint: disable=import-outside-toplevel
         from superset.utils import dict_import_export
@@ -384,6 +388,7 @@ else:
     )
     def export_datasource_schema(back_references: bool) -> None:
         """Export datasource YAML schema to stdout"""
+        return
         # pylint: disable=import-outside-toplevel
         from superset.utils import dict_import_export
 
