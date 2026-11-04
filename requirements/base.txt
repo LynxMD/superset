@@ -17,7 +17,7 @@ alembic==1.19.2
     # via flask-migrate
 amqp==5.4.2
     # via kombu
-apispec==6.10.0
+apispec==6.10.1
     # via flask-appbuilder
 attrs==26.1.0
     # via
