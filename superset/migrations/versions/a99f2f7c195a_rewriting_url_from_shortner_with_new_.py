@@ -52,7 +52,6 @@ def parse_querystring(qs):
 
 
 class Url(Base):
-
     """Used for the short url feature"""
 
     __tablename__ = "url"

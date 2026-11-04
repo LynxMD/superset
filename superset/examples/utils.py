@@ -46,7 +46,9 @@ def load_contents(load_test_data: bool = False) -> Dict[str, Any]:
     """Traverse configs directory and load contents"""
     root = Path("examples/configs")
     package_root = files("superset")
-    resource_names = [entry.name for entry in package_root.joinpath(str(root)).iterdir()]
+    resource_names = [
+        entry.name for entry in package_root.joinpath(str(root)).iterdir()
+    ]
     queue = [root / resource_name for resource_name in resource_names]
 
     contents: Dict[Path, str] = {}

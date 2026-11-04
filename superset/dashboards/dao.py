@@ -57,7 +57,7 @@ class DashboardDAO(BaseDAO):
 
     @staticmethod
     def get_dashboard_changed_on(
-        id_or_slug_or_dashboard: Union[str, Dashboard]
+        id_or_slug_or_dashboard: Union[str, Dashboard],
     ) -> datetime:
         """
         Get latest changed datetime for a dashboard.
@@ -76,7 +76,7 @@ class DashboardDAO(BaseDAO):
 
     @staticmethod
     def get_dashboard_and_slices_changed_on(  # pylint: disable=invalid-name
-        id_or_slug_or_dashboard: Union[str, Dashboard]
+        id_or_slug_or_dashboard: Union[str, Dashboard],
     ) -> datetime:
         """
         Get latest changed datetime for a dashboard. The change could be a dashboard
@@ -102,7 +102,7 @@ class DashboardDAO(BaseDAO):
 
     @staticmethod
     def get_dashboard_and_datasets_changed_on(  # pylint: disable=invalid-name
-        id_or_slug_or_dashboard: Union[str, Dashboard]
+        id_or_slug_or_dashboard: Union[str, Dashboard],
     ) -> datetime:
         """
         Get latest changed datetime for a dashboard. The change could be a dashboard
@@ -226,9 +226,11 @@ class DashboardDAO(BaseDAO):
                     slc_id_dict = {sid: sid for sid in slice_ids}
                 new_filter_scopes = copy_filter_scopes(
                     old_to_new_slc_id_dict=slc_id_dict,
-                    old_filter_scopes=json.loads(data["filter_scopes"] or "{}")
-                    if isinstance(data["filter_scopes"], str)
-                    else data["filter_scopes"],
+                    old_filter_scopes=(
+                        json.loads(data["filter_scopes"] or "{}")
+                        if isinstance(data["filter_scopes"], str)
+                        else data["filter_scopes"]
+                    ),
                 )
 
             default_filters_data = json.loads(data.get("default_filters", "{}"))

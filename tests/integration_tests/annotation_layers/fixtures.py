@@ -25,7 +25,6 @@ from superset.models.annotations import Annotation, AnnotationLayer
 
 from tests.integration_tests.test_app import app
 
-
 ANNOTATION_LAYERS_COUNT = 10
 ANNOTATIONS_COUNT = 5
 
@@ -39,7 +38,10 @@ def get_end_dttm(annotation_id: int) -> datetime:
 
 
 def _insert_annotation_layer(name: str = "", descr: str = "") -> AnnotationLayer:
-    annotation_layer = AnnotationLayer(name=name, descr=descr,)
+    annotation_layer = AnnotationLayer(
+        name=name,
+        descr=descr,
+    )
     db.session.add(annotation_layer)
     db.session.commit()
     return annotation_layer

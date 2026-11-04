@@ -27,8 +27,7 @@ def load_css_templates() -> None:
     obj = db.session.query(CssTemplate).filter_by(template_name="Flat").first()
     if not obj:
         obj = CssTemplate(template_name="Flat")
-    css = textwrap.dedent(
-        """\
+    css = textwrap.dedent("""\
     .navbar {
         transition: opacity 0.5s ease;
         opacity: 0.05;
@@ -48,8 +47,7 @@ def load_css_templates() -> None:
         '#ff3339', '#ff1ab1', '#005c66', '#00b3a5', '#55d12e', '#b37e00', '#988b4e',
      ];
     */
-    """
-    )
+    """)
     obj.css = css
     db.session.merge(obj)
     db.session.commit()
@@ -57,8 +55,7 @@ def load_css_templates() -> None:
     obj = db.session.query(CssTemplate).filter_by(template_name="Courier Black").first()
     if not obj:
         obj = CssTemplate(template_name="Courier Black")
-    css = textwrap.dedent(
-        """\
+    css = textwrap.dedent("""\
     h2 {
         color: white;
         font-size: 52px;
@@ -93,8 +90,7 @@ def load_css_templates() -> None:
         '#ff3339', '#ff1ab1', '#005c66', '#00b3a5', '#55d12e', '#b37e00', '#988b4e',
      ];
     */
-    """
-    )
+    """)
     obj.css = css
     db.session.merge(obj)
     db.session.commit()

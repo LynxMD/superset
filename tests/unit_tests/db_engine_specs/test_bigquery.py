@@ -139,9 +139,6 @@ def test_select_star(mocker: MockFixture, app_context: AppContext) -> None:
         latest_partition=False,
         cols=cols,
     )
-    assert (
-        sql
-        == """SELECT `trailer` AS `trailer`
+    assert sql == """SELECT `trailer` AS `trailer`
 FROM `my_table`
 LIMIT :param_1"""
-    )

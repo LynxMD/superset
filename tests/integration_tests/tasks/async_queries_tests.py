@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """Unit tests for async query celery jobs in Superset"""
+
 from unittest import mock
 from uuid import uuid4
 
@@ -113,7 +114,8 @@ class TestAsyncQueries(SupersetTestCase):
 
         with pytest.raises(SoftTimeLimitExceeded):
             with mock.patch.object(
-                async_queries, "ensure_user_is_set",
+                async_queries,
+                "ensure_user_is_set",
             ) as ensure_user_is_set:
                 ensure_user_is_set.side_effect = SoftTimeLimitExceeded()
                 load_chart_data_into_cache(job_metadata, form_data)
@@ -199,7 +201,8 @@ class TestAsyncQueries(SupersetTestCase):
 
         with pytest.raises(SoftTimeLimitExceeded):
             with mock.patch.object(
-                async_queries, "ensure_user_is_set",
+                async_queries,
+                "ensure_user_is_set",
             ) as ensure_user_is_set:
                 ensure_user_is_set.side_effect = SoftTimeLimitExceeded()
                 load_explore_json_into_cache(job_metadata, form_data)

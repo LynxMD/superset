@@ -102,15 +102,12 @@ class EmailNotification(BaseNotification):  # pylint: disable=too-few-public-met
         )
         img_tags = []
         for msgid in images.keys():
-            img_tags.append(
-                f"""<div class="image">
+            img_tags.append(f"""<div class="image">
                     <img width="1000px" src="cid:{msgid}">
                 </div>
-                """
-            )
+                """)
         img_tag = "".join(img_tags)
-        body = textwrap.dedent(
-            f"""
+        body = textwrap.dedent(f"""
             <html>
               <head>
                 <style type="text/css">
@@ -132,8 +129,7 @@ class EmailNotification(BaseNotification):  # pylint: disable=too-few-public-met
                 {img_tag}
               </body>
             </html>
-            """
-        )
+            """)
 
         if self._content.csv:
             csv_data = {__("%(name)s.csv", name=self._content.name): self._content.csv}

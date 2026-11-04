@@ -20,6 +20,7 @@ Smoke test: every ``superset`` module imports on the current Python and
 dependency versions. It catches removed stdlib modules (e.g. ``distutils``,
 ``imp``) and removed third-party APIs at import time.
 """
+
 import importlib
 from pathlib import Path
 from typing import List

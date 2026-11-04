@@ -16,6 +16,7 @@
 # under the License.
 # pylint: disable=line-too-long
 """A collection of ORM sqlalchemy models for Superset"""
+
 import enum
 import json
 import logging
@@ -81,7 +82,6 @@ class Url(Model, AuditMixinNullable):
 
 
 class KeyValue(Model):  # pylint: disable=too-few-public-methods
-
     """Used for any type of key-value store"""
 
     __tablename__ = "keyvalue"
@@ -106,7 +106,6 @@ class ConfigurationMethod(str, enum.Enum):
 class Database(
     Model, AuditMixinNullable, ImportExportMixin
 ):  # pylint: disable=too-many-public-methods
-
     """An ORM object that stores Database related information"""
 
     __tablename__ = "dbs"
@@ -136,16 +135,14 @@ class Database(
     )
     extra = Column(
         Text,
-        default=textwrap.dedent(
-            """\
+        default=textwrap.dedent("""\
     {
         "metadata_params": {},
         "engine_params": {},
         "metadata_cache_timeout": {},
         "schemas_allowed_for_file_upload": []
     }
-    """
-        ),
+    """),
     )
     encrypted_extra = Column(encrypted_field_factory.create(Text), nullable=True)
     impersonate_user = Column(Boolean, default=False)
@@ -320,7 +317,9 @@ class Database(
         self.sqlalchemy_uri = str(conn)  # hides the password
 
     def get_effective_user(
-        self, object_url: URL, user_name: Optional[str] = None,
+        self,
+        object_url: URL,
+        user_name: Optional[str] = None,
     ) -> Optional[str]:
         """
         Get the effective user, especially during impersonation.
@@ -788,7 +787,6 @@ sqla.event.listen(Database, "after_update", security_manager.set_perm)
 
 
 class Log(Model):  # pylint: disable=too-few-public-methods
-
     """ORM object used to log Superset actions to the database"""
 
     __tablename__ = "logs"

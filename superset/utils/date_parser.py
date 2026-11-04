@@ -99,7 +99,8 @@ def dttm_from_timetuple(date_: struct_time) -> datetime:
 
 
 def get_past_or_future(
-    human_readable: Optional[str], source_time: Optional[datetime] = None,
+    human_readable: Optional[str],
+    source_time: Optional[datetime] = None,
 ) -> datetime:
     cal = parsedatetime.Calendar()
     source_dttm = dttm_from_timetuple(
@@ -109,7 +110,8 @@ def get_past_or_future(
 
 
 def parse_human_timedelta(
-    human_readable: Optional[str], source_time: Optional[datetime] = None,
+    human_readable: Optional[str],
+    source_time: Optional[datetime] = None,
 ) -> timedelta:
     """
     Returns ``datetime.timedelta`` from natural language time deltas
@@ -135,7 +137,8 @@ def parse_past_timedelta(
     or datetime.timedelta(365).
     """
     return -parse_human_timedelta(
-        delta_str if delta_str.startswith("-") else f"-{delta_str}", source_time,
+        delta_str if delta_str.startswith("-") else f"-{delta_str}",
+        source_time,
     )
 
 
@@ -382,9 +385,7 @@ class EvalHolidayFunc:  # pylint: disable=too-few-public-methods
         holiday_year = dttm.year if dttm else parse_human_datetime("today").year
         country = country.eval() if country else "US"
 
-        holiday_lookup = country_holidays(
-            country, years=[holiday_year], observed=False
-        )
+        holiday_lookup = country_holidays(country, years=[holiday_year], observed=False)
         searched_result = holiday_lookup.get_named(holiday)
         if len(searched_result) == 1:
             return dttm_from_timetuple(searched_result[0].timetuple())

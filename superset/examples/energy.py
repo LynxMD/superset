@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """Loads datasets, dashboards and slices in a new superset instance"""
+
 import textwrap
 
 import pandas as pd
@@ -83,8 +84,7 @@ def load_energy(
         viz_type="sankey",
         datasource_type="table",
         datasource_id=tbl.id,
-        params=textwrap.dedent(
-            """\
+        params=textwrap.dedent("""\
         {
             "collapsed_fieldsets": "",
             "groupby": [
@@ -96,8 +96,7 @@ def load_energy(
             "slice_name": "Energy Sankey",
             "viz_type": "sankey"
         }
-        """
-        ),
+        """),
     )
     misc_dash_slices.add(slc.slice_name)
     merge_slice(slc)
@@ -107,8 +106,7 @@ def load_energy(
         viz_type="graph_chart",
         datasource_type="table",
         datasource_id=tbl.id,
-        params=textwrap.dedent(
-            """\
+        params=textwrap.dedent("""\
         {
             "source": "source",
             "target": "target",
@@ -120,8 +118,7 @@ def load_energy(
             "slice_name": "Force",
             "viz_type": "graph_chart"
         }
-        """
-        ),
+        """),
     )
     misc_dash_slices.add(slc.slice_name)
     merge_slice(slc)
@@ -131,8 +128,7 @@ def load_energy(
         viz_type="heatmap",
         datasource_type="table",
         datasource_id=tbl.id,
-        params=textwrap.dedent(
-            """\
+        params=textwrap.dedent("""\
         {
             "all_columns_x": "source",
             "all_columns_y": "target",
@@ -146,8 +142,7 @@ def load_energy(
             "xscale_interval": "1",
             "yscale_interval": "1"
         }
-        """
-        ),
+        """),
     )
     misc_dash_slices.add(slc.slice_name)
     merge_slice(slc)

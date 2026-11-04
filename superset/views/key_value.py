@@ -29,7 +29,6 @@ from superset.views.base import BaseSupersetView, json_error_response
 
 
 class KV(BaseSupersetView):
-
     """Used for storing and retrieving key value pairs"""
 
     @staticmethod

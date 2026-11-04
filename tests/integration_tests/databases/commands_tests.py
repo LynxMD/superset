@@ -208,9 +208,9 @@ class TestExportDatabasesCommand(SupersetTestCase):
                     "is_active": True,
                     "is_dttm": False,
                     "python_date_format": None,
-                    "type": "STRING"
-                    if example_db.backend == "hive"
-                    else "VARCHAR(255)",
+                    "type": (
+                        "STRING" if example_db.backend == "hive" else "VARCHAR(255)"
+                    ),
                     "verbose_name": None,
                 },
                 {
@@ -589,9 +589,9 @@ class TestImportDatabasesCommand(SupersetTestCase):
     def test_import_v1_database_masked_password(self):
         """Test that database imports with masked passwords are rejected"""
         masked_database_config = database_config.copy()
-        masked_database_config[
-            "sqlalchemy_uri"
-        ] = "postgresql://username:XXXXXXXXXX@host:12345/db"
+        masked_database_config["sqlalchemy_uri"] = (
+            "postgresql://username:XXXXXXXXXX@host:12345/db"
+        )
         contents = {
             "metadata.yaml": yaml.safe_dump(database_metadata_config),
             "databases/imported_database.yaml": yaml.safe_dump(masked_database_config),

@@ -35,9 +35,11 @@ def series_to_list(series: Series) -> List[Any]:
     :return: list without nan or inf
     """
     return [
-        None
-        if not isinstance(val, str) and (math.isnan(val) or math.isinf(val))
-        else val
+        (
+            None
+            if not isinstance(val, str) and (math.isnan(val) or math.isinf(val))
+            else val
+        )
         for val in series.tolist()
     ]
 

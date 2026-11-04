@@ -29,9 +29,7 @@ def test_create_firefox_sets_profile_on_options(
     """
     from superset.utils.webdriver import WebDriverProxy
 
-    driver_class = mocker.patch(
-        "superset.utils.webdriver.firefox.webdriver.WebDriver"
-    )
+    driver_class = mocker.patch("superset.utils.webdriver.firefox.webdriver.WebDriver")
     WebDriverProxy("firefox").create()
 
     kwargs: Any = driver_class.call_args.kwargs

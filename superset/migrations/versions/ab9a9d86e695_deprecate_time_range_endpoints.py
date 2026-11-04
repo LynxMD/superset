@@ -21,6 +21,7 @@ Revises: b5a422d8e252
 Create Date: 2022-02-25 08:06:14.835094
 
 """
+
 import json
 
 from alembic import op

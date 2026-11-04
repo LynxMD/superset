@@ -63,10 +63,12 @@ class TemporaryCacheRestApi(BaseApi, ABC):
     def add_apispec_components(self, api_spec: APISpec) -> None:
         try:
             api_spec.components.schema(
-                TemporaryCachePostSchema.__name__, schema=TemporaryCachePostSchema,
+                TemporaryCachePostSchema.__name__,
+                schema=TemporaryCachePostSchema,
             )
             api_spec.components.schema(
-                TemporaryCachePutSchema.__name__, schema=TemporaryCachePutSchema,
+                TemporaryCachePutSchema.__name__,
+                schema=TemporaryCachePutSchema,
             )
         except DuplicateComponentNameError:
             pass
@@ -155,17 +157,13 @@ class TemporaryCacheRestApi(BaseApi, ABC):
             return self.response(404, message=str(ex))
 
     @abstractmethod
-    def get_create_command(self) -> Any:
-        ...
+    def get_create_command(self) -> Any: ...
 
     @abstractmethod
-    def get_update_command(self) -> Any:
-        ...
+    def get_update_command(self) -> Any: ...
 
     @abstractmethod
-    def get_get_command(self) -> Any:
-        ...
+    def get_get_command(self) -> Any: ...
 
     @abstractmethod
-    def get_delete_command(self) -> Any:
-        ...
+    def get_delete_command(self) -> Any: ...

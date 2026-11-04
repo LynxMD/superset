@@ -25,7 +25,6 @@ from superset import security_manager
 
 
 class FilterRelatedOwners(BaseFilter):  # pylint: disable=too-few-public-methods
-
     """
     A filter to allow searching for related owners of a resource.
 

@@ -21,6 +21,7 @@ Revises: 18532d70ab98
 Create Date: 2020-09-28 17:57:23.128142
 
 """
+
 import json
 import os
 import time
@@ -171,7 +172,10 @@ def upgrade():
         with op.batch_alter_table(table_name) as batch_op:
             batch_op.add_column(
                 sa.Column(
-                    "uuid", UUIDType(binary=True), primary_key=False, default=uuid4,
+                    "uuid",
+                    UUIDType(binary=True),
+                    primary_key=False,
+                    default=uuid4,
                 ),
             )
 

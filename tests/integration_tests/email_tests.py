@@ -16,6 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """Unit tests for email service in Superset"""
+
 import logging
 import tempfile
 import unittest

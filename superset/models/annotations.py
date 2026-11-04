@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """a collection of Annotation-related models"""
+
 from typing import Any, Dict
 
 from flask_appbuilder import Model
@@ -25,7 +26,6 @@ from superset.models.helpers import AuditMixinNullable
 
 
 class AnnotationLayer(Model, AuditMixinNullable):
-
     """A logical namespace for a set of annotations"""
 
     __tablename__ = "annotation_layer"
@@ -38,7 +38,6 @@ class AnnotationLayer(Model, AuditMixinNullable):
 
 
 class Annotation(Model, AuditMixinNullable):
-
     """Time-related annotation"""
 
     __tablename__ = "annotation"

@@ -195,7 +195,10 @@ class AbstractEventLogger(ABC):
 
     @contextmanager
     def log_context(
-        self, action: str, object_ref: Optional[str] = None, log_to_statsd: bool = True,
+        self,
+        action: str,
+        object_ref: Optional[str] = None,
+        log_to_statsd: bool = True,
     ) -> Iterator[Callable[..., None]]:
         """
         Log an event with additional information from the request context.
@@ -281,18 +284,14 @@ def get_event_logger_from_cfg_value(cfg_value: Any) -> AbstractEventLogger:
     """
     result: Any = cfg_value
     if inspect.isclass(cfg_value):
-        logging.warning(
-            textwrap.dedent(
-                """
+        logging.warning(textwrap.dedent("""
                 In superset private config, EVENT_LOGGER has been assigned a class
                 object. In order to accomodate pre-configured instances without a
                 default constructor, assignment of a class is deprecated and may no
                 longer work at some point in the future. Please assign an object
                 instance of a type that implements
                 superset.utils.log.AbstractEventLogger.
-                """
-            )
-        )
+                """))
 
         event_logger_type = cast(Type[Any], cfg_value)
         result = event_logger_type()

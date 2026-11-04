@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 from typing import Dict, Any
 
 from tests.integration_tests.test_app import app  # noqa

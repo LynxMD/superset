@@ -63,7 +63,9 @@ class EnsureEnabledMixin:
 
 
 class DruidColumnInlineView(  # pylint: disable=too-many-ancestors
-    CompactCRUDMixin, EnsureEnabledMixin, SupersetModelView,
+    CompactCRUDMixin,
+    EnsureEnabledMixin,
+    SupersetModelView,
 ):
     datamodel = SQLAInterface(models.DruidColumn)
     include_route_methods = RouteMethod.RELATED_VIEW_SET
@@ -153,7 +155,9 @@ class DruidColumnInlineView(  # pylint: disable=too-many-ancestors
 
 
 class DruidMetricInlineView(  # pylint: disable=too-many-ancestors
-    CompactCRUDMixin, EnsureEnabledMixin, SupersetModelView,
+    CompactCRUDMixin,
+    EnsureEnabledMixin,
+    SupersetModelView,
 ):
     datamodel = SQLAInterface(models.DruidMetric)
     include_route_methods = RouteMethod.RELATED_VIEW_SET
@@ -209,7 +213,10 @@ class DruidMetricInlineView(  # pylint: disable=too-many-ancestors
 
 
 class DruidClusterModelView(  # pylint: disable=too-many-ancestors
-    EnsureEnabledMixin, SupersetModelView, DeleteMixin, YamlExportMixin,
+    EnsureEnabledMixin,
+    SupersetModelView,
+    DeleteMixin,
+    YamlExportMixin,
 ):
     datamodel = SQLAInterface(models.DruidCluster)
     include_route_methods = RouteMethod.CRUD_SET
@@ -273,7 +280,10 @@ class DruidClusterModelView(  # pylint: disable=too-many-ancestors
 
 
 class DruidDatasourceModelView(  # pylint: disable=too-many-ancestors
-    EnsureEnabledMixin, DatasourceModelView, DeleteMixin, YamlExportMixin,
+    EnsureEnabledMixin,
+    DatasourceModelView,
+    DeleteMixin,
+    YamlExportMixin,
 ):
     datamodel = SQLAInterface(models.DruidDatasource)
     include_route_methods = RouteMethod.CRUD_SET

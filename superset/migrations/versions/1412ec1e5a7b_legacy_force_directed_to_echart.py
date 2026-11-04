@@ -21,6 +21,7 @@ Revises: c501b7c653a3
 Create Date: 2021-02-14 11:46:02.379832
 
 """
+
 import json
 
 import sqlalchemy as sa

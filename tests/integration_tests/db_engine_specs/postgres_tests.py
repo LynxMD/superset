@@ -179,7 +179,11 @@ class TestPostgresDbEngineSpec(TestDbEngineSpec):
         sql = "SELECT * FROM birth_names"
         results = PostgresEngineSpec.estimate_statement_cost(sql, cursor)
         self.assertEqual(
-            results, {"Start-up cost": 0.00, "Total cost": 1537.91,},
+            results,
+            {
+                "Start-up cost": 0.00,
+                "Total cost": 1537.91,
+            },
         )
 
     def test_estimate_statement_invalid_syntax(self):
@@ -189,13 +193,11 @@ class TestPostgresDbEngineSpec(TestDbEngineSpec):
         from psycopg2 import errors
 
         cursor = mock.Mock()
-        cursor.execute.side_effect = errors.SyntaxError(
-            """
+        cursor.execute.side_effect = errors.SyntaxError("""
             syntax error at or near "EXPLAIN"
             LINE 1: EXPLAIN DROP TABLE birth_names
                             ^
-            """
-        )
+            """)
         sql = "DROP TABLE birth_names"
         with self.assertRaises(errors.SyntaxError):
             PostgresEngineSpec.estimate_statement_cost(sql, cursor)
@@ -205,15 +207,27 @@ class TestPostgresDbEngineSpec(TestDbEngineSpec):
         DB Eng Specs (postgres): Test test_query_cost_formatter example costs
         """
         raw_cost = [
-            {"Start-up cost": 0.00, "Total cost": 1537.91,},
-            {"Start-up cost": 10.00, "Total cost": 1537.00,},
+            {
+                "Start-up cost": 0.00,
+                "Total cost": 1537.91,
+            },
+            {
+                "Start-up cost": 10.00,
+                "Total cost": 1537.00,
+            },
         ]
         result = PostgresEngineSpec.query_cost_formatter(raw_cost)
         self.assertEqual(
             result,
             [
-                {"Start-up cost": "0.0", "Total cost": "1537.91",},
-                {"Start-up cost": "10.0", "Total cost": "1537.0",},
+                {
+                    "Start-up cost": "0.0",
+                    "Total cost": "1537.91",
+                },
+                {
+                    "Start-up cost": "10.0",
+                    "Total cost": "1537.0",
+                },
             ],
         )
 
@@ -268,16 +282,14 @@ class TestPostgresDbEngineSpec(TestDbEngineSpec):
             )
         ]
 
-        msg = dedent(
-            """
+        msg = dedent("""
 psql: error: could not connect to server: Connection refused
         Is the server running on host "localhost" (::1) and accepting
         TCP/IP connections on port 12345?
 could not connect to server: Connection refused
         Is the server running on host "localhost" (127.0.0.1) and accepting
         TCP/IP connections on port 12345?
-            """
-        )
+            """)
         result = PostgresEngineSpec.extract_errors(Exception(msg))
         assert result == [
             SupersetError(
@@ -294,13 +306,11 @@ could not connect to server: Connection refused
             )
         ]
 
-        msg = dedent(
-            """
+        msg = dedent("""
 psql: error: could not connect to server: Operation timed out
         Is the server running on host "example.com" (93.184.216.34) and accepting
         TCP/IP connections on port 12345?
-            """
-        )
+            """)
         result = PostgresEngineSpec.extract_errors(Exception(msg))
         assert result == [
             SupersetError(
@@ -325,13 +335,11 @@ psql: error: could not connect to server: Operation timed out
         ]
 
         # response with IP only
-        msg = dedent(
-            """
+        msg = dedent("""
 psql: error: could not connect to server: Operation timed out
         Is the server running on host "93.184.216.34" and accepting
         TCP/IP connections on port 12345?
-            """
-        )
+            """)
         result = PostgresEngineSpec.extract_errors(Exception(msg))
         assert result == [
             SupersetError(

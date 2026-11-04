@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 import json
 import pytest
 import prison
@@ -28,13 +29,15 @@ from superset.utils.database import get_example_database
 
 from tests.integration_tests.base_tests import SupersetTestCase
 
-
 CSS_TEMPLATES_FIXTURE_COUNT = 5
 
 
 class TestCssTemplateApi(SupersetTestCase):
     def insert_css_template(
-        self, template_name: str, css: str, created_by_username: str = "admin",
+        self,
+        template_name: str,
+        css: str,
+        created_by_username: str = "admin",
     ) -> CssTemplate:
         admin = self.get_user(created_by_username)
         css_template = CssTemplate(

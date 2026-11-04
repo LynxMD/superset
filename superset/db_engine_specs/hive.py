@@ -231,13 +231,11 @@ class HiveEngineSpec(PrestoEngineSpec):
             pq.write_table(pa.Table.from_pandas(df), where=file.name)
 
             engine.execute(
-                text(
-                    f"""
+                text(f"""
                     CREATE TABLE {str(table)} ({schema_definition})
                     STORED AS PARQUET
                     LOCATION :location
-                    """
-                ),
+                    """),
                 location=upload_to_s3(
                     filename=file.name,
                     upload_prefix=current_app.config[
@@ -498,7 +496,10 @@ class HiveEngineSpec(PrestoEngineSpec):
 
     @classmethod
     def update_impersonation_config(
-        cls, connect_args: Dict[str, Any], uri: str, username: Optional[str],
+        cls,
+        connect_args: Dict[str, Any],
+        uri: str,
+        username: Optional[str],
     ) -> None:
         """
         Update a configuration dictionary

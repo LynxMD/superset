@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """a collection of model-related helper classes and functions"""
+
 import json
 import logging
 import re
@@ -436,7 +437,6 @@ class AuditMixinNullable(AuditMixin):
 
 
 class QueryResult:  # pylint: disable=too-few-public-methods
-
     """Object returned by the query interface"""
 
     def __init__(  # pylint: disable=too-many-arguments

@@ -93,7 +93,9 @@ class TestDbEngineSpecs(TestDbEngineSpec):
 
     def test_limit_query_without_force(self):
         self.sql_limit_regex(
-            "SELECT * FROM a LIMIT 10", "SELECT * FROM a LIMIT 10", limit=11,
+            "SELECT * FROM a LIMIT 10",
+            "SELECT * FROM a LIMIT 10",
+            limit=11,
         )
 
     def test_limit_query_with_force(self):
@@ -305,13 +307,10 @@ class TestDbEngineSpecs(TestDbEngineSpec):
             "orderby": [["gender_cc", True]],
         }
         sql = table.get_query_str(query_obj)
-        assert (
-            """ORDER BY case
+        assert """ORDER BY case
              when gender=true then "male"
              else "female"
-         end ASC;"""
-            in sql
-        )
+         end ASC;""" in sql
 
 
 def test_is_readonly():
@@ -399,7 +398,11 @@ def test_get_time_grain_with_unkown_values():
     config = app.config.copy()
 
     app.config["TIME_GRAIN_ADDON_EXPRESSIONS"] = {
-        "mysql": {"PT2H": "foo", "weird": "foo", "PT12H": "foo",}
+        "mysql": {
+            "PT2H": "foo",
+            "weird": "foo",
+            "PT12H": "foo",
+        }
     }
 
     with app.app_context():

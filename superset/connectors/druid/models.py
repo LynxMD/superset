@@ -128,9 +128,9 @@ try:
             self.name = name
             self.post_aggregator = post_aggregator
 
-
 except NameError:
     pass
+
 
 # Function wrapper because bound methods cannot
 # be passed to processes
@@ -139,7 +139,6 @@ def _fetch_metadata_for(datasource: "DruidDatasource") -> Optional[Dict[str, Any
 
 
 class DruidCluster(Model, AuditMixinNullable, ImportExportMixin):
-
     """ORM object referencing the Druid clusters"""
 
     __tablename__ = "clusters"
@@ -397,7 +396,6 @@ class DruidColumn(Model, BaseColumn):
 
 
 class DruidMetric(Model, BaseMetric):
-
     """ORM object referencing Druid metrics for a datasource"""
 
     __tablename__ = "metrics"
@@ -461,7 +459,6 @@ druiddatasource_user = Table(
 
 
 class DruidDatasource(Model, BaseDatasource):
-
     """ORM object referencing Druid datasources (tables)"""
 
     __tablename__ = "datasources"
@@ -996,9 +993,7 @@ class DruidDatasource(Model, BaseDatasource):
                     # Check if this dimension uses an extraction function
                     # If so, create the appropriate pydruid extraction object
                     if isinstance(dim, dict) and "extractionFn" in dim:
-                        (col, extraction_fn) = DruidDatasource._create_extraction_fn(
-                            dim
-                        )
+                        col, extraction_fn = DruidDatasource._create_extraction_fn(dim)
                         dim_val = dim["outputName"]
                         f = Filter(
                             dimension=col,
@@ -1106,7 +1101,7 @@ class DruidDatasource(Model, BaseDatasource):
 
     @staticmethod
     def _dimensions_to_values(
-        dimensions: List[Union[Dict[str, str], str]]
+        dimensions: List[Union[Dict[str, str], str]],
     ) -> List[Union[Dict[str, str], str]]:
         """
         Replace dimensions specs with their `dimension`
@@ -1190,9 +1185,9 @@ class DruidDatasource(Model, BaseDatasource):
         metrics_dict = {m.metric_name: m for m in self.metrics}
         columns_dict = {c.column_name: c for c in self.columns}
 
-        if self.cluster and Version(
-            self.cluster.get_druid_version()
-        ) < Version("0.11.0"):
+        if self.cluster and Version(self.cluster.get_druid_version()) < Version(
+            "0.11.0"
+        ):
             for metric in metrics:
                 self.sanitize_metric_object(metric)
             if timeseries_limit_metric:
@@ -1452,9 +1447,7 @@ class DruidDatasource(Model, BaseDatasource):
         )
 
     @staticmethod
-    def _create_extraction_fn(
-        dim_spec: Dict[str, Any]
-    ) -> Tuple[
+    def _create_extraction_fn(dim_spec: Dict[str, Any]) -> Tuple[
         str,
         Union[
             "MapLookupExtraction",
@@ -1523,7 +1516,7 @@ class DruidDatasource(Model, BaseDatasource):
             dim_spec = column_def.dimension_spec if column_def else None
             extraction_fn = None
             if dim_spec and "extractionFn" in dim_spec:
-                (col, extraction_fn) = DruidDatasource._create_extraction_fn(dim_spec)
+                col, extraction_fn = DruidDatasource._create_extraction_fn(dim_spec)
 
             cond = None
             is_numeric_col = col in num_cols
@@ -1534,9 +1527,11 @@ class DruidDatasource(Model, BaseDatasource):
             eq = cls.filter_values_handler(
                 eq,
                 is_list_target=is_list_target,
-                target_column_type=utils.GenericDataType.NUMERIC
-                if is_numeric_col
-                else utils.GenericDataType.STRING,
+                target_column_type=(
+                    utils.GenericDataType.NUMERIC
+                    if is_numeric_col
+                    else utils.GenericDataType.STRING
+                ),
             )
 
             # For these two ops, could have used Dimension,

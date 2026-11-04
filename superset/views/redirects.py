@@ -30,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 
 class R(BaseSupersetView):  # pylint: disable=invalid-name
-
     """used for short urls"""
 
     @staticmethod

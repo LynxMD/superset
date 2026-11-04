@@ -273,13 +273,13 @@ def not_exists_user_id() -> int:
 
 @pytest.fixture()
 def dashboard_based_filter_set_dict(
-    filtersets: Dict[str, List[FilterSet]]
+    filtersets: Dict[str, List[FilterSet]],
 ) -> Dict[str, Any]:
     return filtersets["Dashboard"][0].to_dict()
 
 
 @pytest.fixture()
 def user_based_filter_set_dict(
-    filtersets: Dict[str, List[FilterSet]]
+    filtersets: Dict[str, List[FilterSet]],
 ) -> Dict[str, Any]:
     return filtersets[FILTER_SET_OWNER_USERNAME][0].to_dict()

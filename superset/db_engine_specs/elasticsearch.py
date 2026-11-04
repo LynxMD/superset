@@ -77,9 +77,7 @@ class ElasticSearchEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-metho
             supports_dttm_parse = False
             try:
                 if es_version:
-                    supports_dttm_parse = Version(es_version) >= Version(
-                        "7.8"
-                    )
+                    supports_dttm_parse = Version(es_version) >= Version("7.8")
             except Exception as ex:  # pylint: disable=broad-except
                 logger.error("Unexpected error while convert es_version", exc_info=True)
                 logger.exception(ex)

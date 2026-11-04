@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 import json
 from io import BytesIO
 from typing import Optional
@@ -39,7 +40,6 @@ from tests.integration_tests.fixtures.importexport import (
     saved_queries_config,
     saved_queries_metadata_config,
 )
-
 
 SAVED_QUERIES_FIXTURE_COUNT = 10
 

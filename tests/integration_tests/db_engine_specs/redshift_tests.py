@@ -75,16 +75,14 @@ class TestRedshiftDbEngineSpec(TestDbEngineSpec):
                 },
             )
         ]
-        msg = dedent(
-            """
+        msg = dedent("""
 psql: error: could not connect to server: Connection refused
         Is the server running on host "localhost" (::1) and accepting
         TCP/IP connections on port 12345?
 could not connect to server: Connection refused
         Is the server running on host "localhost" (127.0.0.1) and accepting
         TCP/IP connections on port 12345?
-            """
-        )
+            """)
         result = RedshiftEngineSpec.extract_errors(Exception(msg))
         assert result == [
             SupersetError(
@@ -101,13 +99,11 @@ could not connect to server: Connection refused
             )
         ]
 
-        msg = dedent(
-            """
+        msg = dedent("""
 psql: error: could not connect to server: Operation timed out
         Is the server running on host "example.com" (93.184.216.34) and accepting
         TCP/IP connections on port 12345?
-            """
-        )
+            """)
         result = RedshiftEngineSpec.extract_errors(Exception(msg))
         assert result == [
             SupersetError(
@@ -132,13 +128,11 @@ psql: error: could not connect to server: Operation timed out
         ]
 
         # response with IP only
-        msg = dedent(
-            """
+        msg = dedent("""
 psql: error: could not connect to server: Operation timed out
         Is the server running on host "93.184.216.34" and accepting
         TCP/IP connections on port 12345?
-            """
-        )
+            """)
         result = RedshiftEngineSpec.extract_errors(Exception(msg))
         assert result == [
             SupersetError(

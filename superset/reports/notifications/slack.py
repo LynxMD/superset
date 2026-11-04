@@ -96,15 +96,19 @@ Error: %(text)s
 
         # Flatten columns/index so they show up nicely in the table
         df.columns = [
-            " ".join(str(name) for name in column).strip()
-            if isinstance(column, tuple)
-            else column
+            (
+                " ".join(str(name) for name in column).strip()
+                if isinstance(column, tuple)
+                else column
+            )
             for column in df.columns
         ]
         df.index = [
-            " ".join(str(name) for name in index).strip()
-            if isinstance(index, tuple)
-            else index
+            (
+                " ".join(str(name) for name in index).strip()
+                if isinstance(index, tuple)
+                else index
+            )
             for index in df.index
         ]
 

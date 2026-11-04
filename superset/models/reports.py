@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """A collection of ORM sqlalchemy models for Superset"""
+
 import enum
 import json
 from typing import Any, Dict, Optional
@@ -96,7 +97,6 @@ report_schedule_user = Table(
 
 
 class ReportSchedule(Model, AuditMixinNullable):
-
     """
     Report Schedules, supports alerts and reports
     """
@@ -188,7 +188,6 @@ class ReportRecipients(Model, AuditMixinNullable):
 
 
 class ReportExecutionLog(Model):  # pylint: disable=too-few-public-methods
-
     """
     Report Execution Log, hold the result of the report execution with timestamps,
     last observation and possible error messages
