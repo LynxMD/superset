@@ -25,12 +25,16 @@ RUN mkdir /app \
         && apt-get update -y \
         && apt-get install -y --no-install-recommends \
             build-essential \
+            cargo \
             default-libmysqlclient-dev \
             libpq-dev \
             libsasl2-dev \
             libecpg-dev \
+            pkg-config \
         && rm -rf /var/lib/apt/lists/*
 
+# cargo builds python-geohash>=0.9 on platforms without a prebuilt wheel
+# (e.g. linux/arm64); pkg-config lets mysqlclient>=2.2 find libmysqlclient.
 # First, we just wanna install requirements, which will allow us to utilize the cache
 # in order to only build if and only if requirements change
 COPY ./requirements/*.txt  /app/requirements/
