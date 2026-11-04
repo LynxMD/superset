@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - name: 'Download artifact'
-      uses: actions/github-script@v3.1.0
+      uses: actions/github-script@v9
       with:
         script: |
-          const artifacts = await github.actions.listWorkflowRunArtifacts({
+          const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: ${{ github.event.workflow_run.id }},
@@ -31,7 +31,7 @@ jobs:
           })[0];
           if(!matchArtifact) return core.setFailed("Build artifacts not found")
 
-          const download = await github.actions.downloadArtifact({
+          const download = await github.rest.actions.downloadArtifact({
               owner: context.repo.owner,
               repo: context.repo.repo,
               artifact_id: matchArtifact.id,
@@ -54,7 +54,7 @@ jobs:
       run: echo "::set-output name=num::$(cat ./PR-NUM)"
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -62,7 +62,7 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
     - name: Load, tag and push image to ECR
       id: push-image

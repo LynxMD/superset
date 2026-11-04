@@ -16,7 +16,7 @@ jobs:
         node-version: [16]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           # pulls all commits (needed for lerna / semantic release to correctly version)
           fetch-depth: 0
@@ -27,12 +27,12 @@ jobs:
           git tag -d `git tag | grep -E '^trigger-'`
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Cache npm
-        uses: actions/cache@v1
+        uses: actions/cache@v6
         with:
           path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
           key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -44,7 +44,7 @@ jobs:
         id: npm-cache-dir-path
         run: echo "::set-output name=dir::$(npm config get cache)"
       - name: Cache npm
-        uses: actions/cache@v1
+        uses: actions/cache@v6
         id: npm-cache # use this to check for `cache-hit` (`steps.npm-cache.outputs.cache-hit != 'true'`)
         with:
           path: ${{ steps.npm-cache-dir-path.outputs.dir }}
