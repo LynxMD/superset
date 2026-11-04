@@ -16,8 +16,8 @@
 # under the License.
 from typing import Optional, Type, TYPE_CHECKING
 
-from flask import Markup
 from flask_appbuilder import Model
+from markupsafe import Markup
 from sqlalchemy import Column, Integer, String
 
 from superset import app, db, security_manager

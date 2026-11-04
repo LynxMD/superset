@@ -18,16 +18,17 @@ import json
 import logging
 from datetime import datetime
 
-from flask import current_app as app, flash, Markup, redirect
+from flask import current_app as app, flash, redirect
 from flask_appbuilder import CompactCRUDMixin, expose
+from flask_appbuilder.fields import QuerySelectField
 from flask_appbuilder.fieldwidgets import Select2Widget
 from flask_appbuilder.hooks import before_request
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.security.decorators import has_access
 from flask_babel import lazy_gettext as _
+from markupsafe import Markup
 from werkzeug.exceptions import NotFound
 from wtforms import StringField
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from superset import db, security_manager
 from superset.connectors.base.views import BS3TextFieldROWidget, DatasourceModelView
@@ -113,7 +114,8 @@ class DruidColumnInlineView(  # pylint: disable=too-many-ancestors
     add_form_extra_fields = {
         "datasource": QuerySelectField(
             "Datasource",
-            query_factory=lambda: db.session.query(models.DruidDatasource),
+            query_func=lambda: db.session.query(models.DruidDatasource),
+            get_pk_func=lambda obj: obj.id,
             allow_blank=True,
             widget=Select2Widget(extra_classes="readonly"),
         )
@@ -196,7 +198,8 @@ class DruidMetricInlineView(  # pylint: disable=too-many-ancestors
     add_form_extra_fields = {
         "datasource": QuerySelectField(
             "Datasource",
-            query_factory=lambda: db.session.query(models.DruidDatasource),
+            query_func=lambda: db.session.query(models.DruidDatasource),
+            get_pk_func=lambda obj: obj.id,
             allow_blank=True,
             widget=Select2Widget(extra_classes="readonly"),
         )
@@ -357,7 +360,8 @@ class DruidDatasourceModelView(  # pylint: disable=too-many-ancestors
     edit_form_extra_fields = {
         "cluster": QuerySelectField(
             "Cluster",
-            query_factory=lambda: db.session.query(models.DruidCluster),
+            query_func=lambda: db.session.query(models.DruidCluster),
+            get_pk_func=lambda obj: obj.id,
             widget=Select2Widget(extra_classes="readonly"),
         ),
         "datasource_name": StringField(

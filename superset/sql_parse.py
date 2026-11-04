@@ -15,13 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
-import re
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Set, Tuple
 from urllib import parse
 
 import sqlparse
+from sqlparse import keywords
+from sqlparse.lexer import Lexer
 from sqlparse.sql import (
     Identifier,
     IdentifierList,
@@ -54,13 +55,13 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: Workaround for https://github.com/andialbrecht/sqlparse/issues/652.
-sqlparse.keywords.SQL_REGEX.insert(
-    0,
-    (
-        re.compile(r"'(''|\\\\|\\|[^'])*'", sqlparse.keywords.FLAGS).match,
-        sqlparse.tokens.String.Single,
-    ),
-)
+# sqlparse>=0.4.4 compiles SQL_REGEX inside the default Lexer instance, so the
+# lexer must be reconfigured after the extra rule is added.
+# reference: https://sqlparse.readthedocs.io/en/stable/extending/
+_lexer = Lexer.get_default_instance()
+_sql_regex = list(keywords.SQL_REGEX)
+_sql_regex.insert(0, (r"'(''|\\\\|\\|[^'])*'", sqlparse.tokens.String.Single))
+_lexer.set_SQL_REGEX(_sql_regex)
 
 
 class CtasMethod(str, Enum):

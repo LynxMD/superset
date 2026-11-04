@@ -41,22 +41,22 @@ class TestTrinoDbEngineSpec(TestDbEngineSpec):
         )
 
     def test_adjust_database_uri(self):
-        url = URL(drivername="trino", database="hive")
-        TrinoEngineSpec.adjust_database_uri(url, selected_schema="foobar")
+        url = URL.create(drivername="trino", database="hive")
+        url = TrinoEngineSpec.adjust_database_uri(url, selected_schema="foobar")
         self.assertEqual(url.database, "hive/foobar")
 
     def test_adjust_database_uri_when_database_contain_schema(self):
-        url = URL(drivername="trino", database="hive/default")
-        TrinoEngineSpec.adjust_database_uri(url, selected_schema="foobar")
+        url = URL.create(drivername="trino", database="hive/default")
+        url = TrinoEngineSpec.adjust_database_uri(url, selected_schema="foobar")
         self.assertEqual(url.database, "hive/foobar")
 
     def test_adjust_database_uri_when_selected_schema_is_none(self):
-        url = URL(drivername="trino", database="hive")
-        TrinoEngineSpec.adjust_database_uri(url, selected_schema=None)
+        url = URL.create(drivername="trino", database="hive")
+        url = TrinoEngineSpec.adjust_database_uri(url, selected_schema=None)
         self.assertEqual(url.database, "hive")
 
-        url.database = "hive/default"
-        TrinoEngineSpec.adjust_database_uri(url, selected_schema=None)
+        url = url.set(database="hive/default")
+        url = TrinoEngineSpec.adjust_database_uri(url, selected_schema=None)
         self.assertEqual(url.database, "hive/default")
 
     def test_get_extra_params(self):

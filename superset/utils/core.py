@@ -33,7 +33,6 @@ import traceback
 import uuid
 import zlib
 from datetime import date, datetime, time, timedelta
-from distutils.util import strtobool
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -70,13 +69,12 @@ import numpy as np
 import pandas as pd
 import sqlalchemy as sa
 from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.backends.openssl.x509 import _Certificate
-from flask import current_app, flash, g, Markup, render_template, request
+from flask import current_app, flash, g, render_template, request
 from flask_appbuilder import SQLA
 from flask_appbuilder.security.sqla.models import Role, User
 from flask_babel import gettext as __
 from flask_babel.speaklater import LazyString
+from markupsafe import Markup
 from pandas.api.types import infer_dtype
 from pandas.core.dtypes.common import is_numeric_dtype
 from sqlalchemy import event, exc, inspect, select, Text
@@ -1393,7 +1391,7 @@ def get_username() -> Optional[str]:
         return None
 
 
-def parse_ssl_cert(certificate: str) -> _Certificate:
+def parse_ssl_cert(certificate: str) -> x509.Certificate:
     """
     Parses the contents of a certificate and returns a valid certificate object
     if valid.
@@ -1403,9 +1401,7 @@ def parse_ssl_cert(certificate: str) -> _Certificate:
     :raises CertificateException: If certificate is not valid/unparseable
     """
     try:
-        return x509.load_pem_x509_certificate(
-            certificate.encode("utf-8"), default_backend()
-        )
+        return x509.load_pem_x509_certificate(certificate.encode("utf-8"))
     except ValueError as ex:
         raise CertificateException("Invalid certificate") from ex
 
@@ -1625,6 +1621,27 @@ def indexed(
         key_ = getattr(item, key) if isinstance(key, str) else key(item)
         idx.setdefault(key_, []).append(item)
     return idx
+
+
+def strtobool(val: str) -> bool:
+    """
+    Convert a string representation of truth to True or False.
+
+    This replaces ``distutils.util.strtobool``; Python 3.12 removed distutils.
+
+    >>> strtobool("yes")
+    True
+    >>> strtobool("off")
+    False
+
+    :raises ValueError: if ``val`` is not a known truth value
+    """
+    val = val.lower()
+    if val in ("y", "yes", "t", "true", "on", "1"):
+        return True
+    if val in ("n", "no", "f", "false", "off", "0"):
+        return False
+    raise ValueError(f"invalid truth value {val!r}")
 
 
 def is_test() -> bool:

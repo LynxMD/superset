@@ -17,10 +17,10 @@
 # pylint: disable=unused-argument, import-outside-toplevel, protected-access
 
 from flask.ctx import AppContext
-from pybigquery.sqlalchemy_bigquery import BigQueryDialect
 from pytest_mock import MockFixture
 from sqlalchemy import select
 from sqlalchemy.sql import sqltypes
+from sqlalchemy_bigquery import BigQueryDialect
 
 
 def test_get_fields(app_context: AppContext) -> None:

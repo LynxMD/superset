@@ -17,6 +17,7 @@
 """Contains the logic to create cohesive forms on the explore view"""
 from typing import List
 
+from flask_appbuilder.fields import QuerySelectField
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
 from flask_appbuilder.forms import DynamicForm
 from flask_babel import lazy_gettext as _
@@ -28,7 +29,6 @@ from wtforms import (
     SelectField,
     StringField,
 )
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional, Regexp
 
 from superset import app, db, security_manager
@@ -121,8 +121,8 @@ class CsvToDatabaseForm(UploadToDatabaseForm):
     )
     con = QuerySelectField(
         _("Database"),
-        query_factory=UploadToDatabaseForm.file_allowed_dbs,
-        get_pk=lambda a: a.id,
+        query_func=UploadToDatabaseForm.file_allowed_dbs,
+        get_pk_func=lambda a: a.id,
         get_label=lambda a: a.database_name,
     )
     schema = StringField(
@@ -283,8 +283,8 @@ class ExcelToDatabaseForm(UploadToDatabaseForm):
 
     con = QuerySelectField(
         _("Database"),
-        query_factory=UploadToDatabaseForm.file_allowed_dbs,
-        get_pk=lambda a: a.id,
+        query_func=UploadToDatabaseForm.file_allowed_dbs,
+        get_pk_func=lambda a: a.id,
         get_label=lambda a: a.database_name,
     )
     schema = StringField(
@@ -414,8 +414,8 @@ class ColumnarToDatabaseForm(UploadToDatabaseForm):
 
     con = QuerySelectField(
         _("Database"),
-        query_factory=UploadToDatabaseForm.file_allowed_dbs,
-        get_pk=lambda a: a.id,
+        query_func=UploadToDatabaseForm.file_allowed_dbs,
+        get_pk_func=lambda a: a.id,
         get_label=lambda a: a.database_name,
     )
     schema = StringField(

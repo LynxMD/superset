@@ -555,8 +555,8 @@ def _deserialize_results_payload(
 
         with stats_timing("sqllab.query.results_backend_pa_deserialize", stats_logger):
             try:
-                pa_table = pa.deserialize(ds_payload["data"])
-            except pa.ArrowSerializationError as ex:
+                pa_table = pa.ipc.open_stream(ds_payload["data"]).read_all()
+            except pa.ArrowException as ex:
                 raise SerializationError("Unable to deserialize table") from ex
 
         df = result_set.SupersetResultSet.convert_table_to_df(pa_table)

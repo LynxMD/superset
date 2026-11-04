@@ -21,18 +21,18 @@ import re
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime, timedelta
-from distutils.version import LooseVersion
 from multiprocessing.pool import ThreadPool
 from typing import Any, cast, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import pandas as pd
 import sqlalchemy as sa
 from dateutil.parser import parse as dparse
-from flask import escape, Markup
 from flask_appbuilder import Model
 from flask_appbuilder.models.decorators import renders
 from flask_appbuilder.security.sqla.models import User
 from flask_babel import lazy_gettext as _
+from markupsafe import escape, Markup
+from packaging.version import Version
 from sqlalchemy import (
     Boolean,
     Column,
@@ -619,7 +619,7 @@ class DruidDatasource(Model, BaseDatasource):
         # realtime segments, which triggered a bug (fixed in druid 0.8.2).
         # https://groups.google.com/forum/#!topic/druid-user/gVCqqspHqOQ
         lbound = (max_time - timedelta(days=7)).isoformat()
-        if LooseVersion(self.cluster.druid_version) < LooseVersion("0.8.2"):
+        if Version(self.cluster.druid_version) < Version("0.8.2"):
             rbound = (max_time - timedelta(1)).isoformat()
         else:
             rbound = max_time.isoformat()
@@ -637,7 +637,7 @@ class DruidDatasource(Model, BaseDatasource):
         if not segment_metadata:
             # if no segments in the past 7 days, look at all segments
             lbound = datetime(1901, 1, 1).isoformat()[:10]
-            if LooseVersion(self.cluster.druid_version) < LooseVersion("0.8.2"):
+            if Version(self.cluster.druid_version) < Version("0.8.2"):
                 rbound = datetime.now().isoformat()
             else:
                 rbound = datetime(2050, 1, 1).isoformat()[:10]
@@ -1190,9 +1190,9 @@ class DruidDatasource(Model, BaseDatasource):
         metrics_dict = {m.metric_name: m for m in self.metrics}
         columns_dict = {c.column_name: c for c in self.columns}
 
-        if self.cluster and LooseVersion(
+        if self.cluster and Version(
             self.cluster.get_druid_version()
-        ) < LooseVersion("0.11.0"):
+        ) < Version("0.11.0"):
             for metric in metrics:
                 self.sanitize_metric_object(metric)
             if timeseries_limit_metric:

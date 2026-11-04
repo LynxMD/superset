@@ -21,10 +21,10 @@ from typing import Any, Dict, List
 
 import simplejson as json
 import sqlalchemy as sqla
-from flask import Markup
 from flask_appbuilder import Model
 from flask_appbuilder.models.decorators import renders
 from humanize import naturaltime
+from markupsafe import Markup
 from sqlalchemy import (
     Boolean,
     Column,

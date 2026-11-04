@@ -26,8 +26,9 @@ from selenium.common.exceptions import (
     TimeoutException,
     WebDriverException,
 )
-from selenium.webdriver import chrome, firefox, FirefoxProfile
+from selenium.webdriver import chrome, firefox
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -59,17 +60,19 @@ class WebDriverProxy:
     def create(self) -> WebDriver:
         pixel_density = current_app.config["WEBDRIVER_WINDOW"].get("pixel_density", 1)
         if self._driver_type == "firefox":
-            driver_class = firefox.webdriver.WebDriver
-            options = firefox.options.Options()
+            driver_class: Any = firefox.webdriver.WebDriver
+            service_class: Any = firefox.service.Service
+            options: Any = firefox.options.Options()
             profile = FirefoxProfile()
             profile.set_preference("layout.css.devPixelsPerPx", str(pixel_density))
-            kwargs: Dict[Any, Any] = dict(options=options, firefox_profile=profile)
+            # selenium>=4.10 removed the ``firefox_profile`` argument
+            options.profile = profile
         elif self._driver_type == "chrome":
             driver_class = chrome.webdriver.WebDriver
+            service_class = chrome.service.Service
             options = chrome.options.Options()
             options.add_argument(f"--force-device-scale-factor={pixel_density}")
             options.add_argument(f"--window-size={self._window[0]},{self._window[1]}")
-            kwargs = dict(options=options)
         else:
             raise Exception(f"Webdriver name ({self._driver_type}) not supported")
         # Prepare args for the webdriver init
@@ -78,10 +81,17 @@ class WebDriverProxy:
         for arg in current_app.config["WEBDRIVER_OPTION_ARGS"]:
             options.add_argument(arg)
 
-        kwargs.update(current_app.config["WEBDRIVER_CONFIGURATION"])
+        # selenium>=4.10 takes driver settings (log output, port, ...) through a
+        # ``Service`` object, configured with WEBDRIVER_CONFIGURATION["service"]
+        webdriver_conf: Dict[str, Any] = dict(
+            current_app.config["WEBDRIVER_CONFIGURATION"]
+        )
+        if binary_location := webdriver_conf.get("binary_location"):
+            options.binary_location = binary_location
+        service = service_class(**webdriver_conf.get("service", {}))
         logger.info("Init selenium driver")
 
-        return driver_class(**kwargs)
+        return driver_class(service=service, options=options)
 
     def auth(self, user: "User") -> WebDriver:
         driver = self.create()

@@ -24,7 +24,7 @@ from typing import Any, Callable, Dict, Optional, TYPE_CHECKING, Union
 from flask import current_app as app, request
 from flask_caching import Cache
 from flask_caching.backends import NullCache
-from werkzeug.wrappers.etag import ETagResponseMixin
+from werkzeug.wrappers import Response as ETagResponseMixin
 
 from superset import db
 from superset.extensions import cache_manager

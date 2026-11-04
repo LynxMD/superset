@@ -20,16 +20,17 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, cast, Dict, List, Union
 
-from flask import current_app, flash, Markup, redirect
+from flask import current_app, flash, redirect
 from flask_appbuilder import CompactCRUDMixin, expose
 from flask_appbuilder.actions import action
+from flask_appbuilder.fields import QuerySelectField
 from flask_appbuilder.fieldwidgets import Select2Widget
 from flask_appbuilder.hooks import before_request
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.security.decorators import has_access
 from flask_babel import gettext as __, lazy_gettext as _
+from markupsafe import Markup
 from werkzeug.exceptions import NotFound
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Regexp
 
 from superset import app, db, is_feature_enabled
@@ -173,7 +174,8 @@ class TableColumnInlineView(CompactCRUDMixin, SupersetModelView):
     add_form_extra_fields = {
         "table": QuerySelectField(
             "Table",
-            query_factory=lambda: db.session.query(models.SqlaTable),
+            query_func=lambda: db.session.query(models.SqlaTable),
+            get_pk_func=lambda obj: obj.id,
             allow_blank=True,
             widget=Select2Widget(extra_classes="readonly"),
         )
@@ -266,7 +268,8 @@ class SqlMetricInlineView(CompactCRUDMixin, SupersetModelView):
     add_form_extra_fields = {
         "table": QuerySelectField(
             "Table",
-            query_factory=lambda: db.session.query(models.SqlaTable),
+            query_func=lambda: db.session.query(models.SqlaTable),
+            get_pk_func=lambda obj: obj.id,
             allow_blank=True,
             widget=Select2Widget(extra_classes="readonly"),
         )
@@ -508,7 +511,8 @@ class TableModelView(  # pylint: disable=too-many-ancestors
     edit_form_extra_fields = {
         "database": QuerySelectField(
             "Database",
-            query_factory=lambda: db.session.query(models.Database),
+            query_func=lambda: db.session.query(models.Database),
+            get_pk_func=lambda obj: obj.id,
             widget=Select2Widget(extra_classes="readonly"),
         )
     }

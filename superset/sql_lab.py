@@ -326,12 +326,11 @@ def _serialize_and_expand_data(
         with stats_timing(
             "sqllab.query.results_backend_pa_serialization", stats_logger
         ):
-            data = (
-                pa.default_serialization_context()
-                .serialize(result_set.pa_table)
-                .to_buffer()
-                .to_pybytes()
-            )
+            # pyarrow removed ``serialize``; store the table as an Arrow IPC stream
+            sink = pa.BufferOutputStream()
+            with pa.ipc.new_stream(sink, result_set.pa_table.schema) as writer:
+                writer.write_table(result_set.pa_table)
+            data = sink.getvalue().to_pybytes()
 
         # expand when loading data from results backend
         all_columns, expanded_columns = (selected_columns, [])

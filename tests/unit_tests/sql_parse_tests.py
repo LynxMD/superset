@@ -1010,18 +1010,19 @@ FROM foo f"""
 
 def test_unknown_select() -> None:
     """
-    Test that `is_select` works when sqlparse fails to identify the type.
+    Test that `is_select` works for CTEs, whether or not sqlparse identifies
+    the statement type (sqlparse>=0.4.4 reports SELECT, older versions UNKNOWN).
     """
     sql = "WITH foo AS(SELECT 1) SELECT 1"
-    assert sqlparse.parse(sql)[0].get_type() == "UNKNOWN"
+    assert sqlparse.parse(sql)[0].get_type() in {"UNKNOWN", "SELECT"}
     assert ParsedQuery(sql).is_select()
 
     sql = "WITH foo AS(SELECT 1) INSERT INTO my_table (a) VALUES (1)"
-    assert sqlparse.parse(sql)[0].get_type() == "UNKNOWN"
+    assert sqlparse.parse(sql)[0].get_type() in {"UNKNOWN", "INSERT"}
     assert not ParsedQuery(sql).is_select()
 
     sql = "WITH foo AS(SELECT 1) DELETE FROM my_table"
-    assert sqlparse.parse(sql)[0].get_type() == "UNKNOWN"
+    assert sqlparse.parse(sql)[0].get_type() in {"UNKNOWN", "DELETE"}
     assert not ParsedQuery(sql).is_select()
 
 

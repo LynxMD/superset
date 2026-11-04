@@ -21,7 +21,6 @@ in your PYTHONPATH as there is a ``from superset_config import *``
 at the end of this file.
 """
 # pylint: disable=too-many-lines
-import imp  # pylint: disable=deprecated-module
 import importlib.util
 import json
 import logging
@@ -32,7 +31,6 @@ from collections import OrderedDict
 from datetime import timedelta
 from typing import Any, Callable, Dict, List, Optional, Type, TYPE_CHECKING, Union
 
-import pkg_resources
 from cachelib.base import BaseCache
 from celery.schedules import crontab
 from dateutil import tz
@@ -64,7 +62,7 @@ EVENT_LOGGER = DBEventLogger()
 
 SUPERSET_LOG_VIEW = True
 
-BASE_DIR = pkg_resources.resource_filename("superset", "")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if "SUPERSET_HOME" in os.environ:
     DATA_DIR = os.environ["SUPERSET_HOME"]
 else:
@@ -73,12 +71,8 @@ else:
 # ---------------------------------------------------------
 # Superset specific config
 # ---------------------------------------------------------
-VERSION_INFO_FILE = pkg_resources.resource_filename(
-    "superset", "static/version_info.json"
-)
-PACKAGE_JSON_FILE = pkg_resources.resource_filename(
-    "superset", "static/assets/package.json"
-)
+VERSION_INFO_FILE = os.path.join(BASE_DIR, "static", "version_info.json")
+PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "static", "assets", "package.json")
 
 # Multiple favicons can be specified here. The "href" property
 # is mandatory, but "sizes," "type," and "rel" are optional.
@@ -1133,7 +1127,9 @@ WEBDRIVER_WINDOW = {
 WEBDRIVER_AUTH_FUNC = None
 
 # Any config options to be passed as-is to the webdriver
-WEBDRIVER_CONFIGURATION: Dict[Any, Any] = {"service_log_path": "/dev/null"}
+# selenium>=4.10: settings under "service" go to the driver's ``Service`` class,
+# and "binary_location" sets the browser binary on the options
+WEBDRIVER_CONFIGURATION: Dict[Any, Any] = {"service": {"log_output": "/dev/null"}}
 
 # Additional args to be passed as arguments to the config object
 # Note: these options are Chrome-specific. For FF, these should
@@ -1330,7 +1326,12 @@ if CONFIG_PATH_ENV_VAR in os.environ:
     cfg_path = os.environ[CONFIG_PATH_ENV_VAR]
     try:
         module = sys.modules[__name__]
-        override_conf = imp.load_source("superset_config", cfg_path)
+        spec = importlib.util.spec_from_file_location("superset_config", cfg_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Cannot load config from {cfg_path}")
+        override_conf = importlib.util.module_from_spec(spec)
+        sys.modules["superset_config"] = override_conf
+        spec.loader.exec_module(override_conf)
         for key in dir(override_conf):
             if key.isupper():
                 setattr(module, key, getattr(override_conf, key))

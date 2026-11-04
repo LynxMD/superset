@@ -23,7 +23,6 @@ from flask_appbuilder.api import BaseApi, safe
 from flask_appbuilder.security.decorators import permission_name, protect
 from flask_wtf.csrf import generate_csrf
 from marshmallow import EXCLUDE, fields, post_load, Schema, ValidationError
-from marshmallow_enum import EnumField
 
 from superset.extensions import event_logger
 from superset.security.guest_token import GuestTokenResourceType
@@ -47,7 +46,7 @@ class UserSchema(PermissiveSchema):
 
 
 class ResourceSchema(PermissiveSchema):
-    type = EnumField(GuestTokenResourceType, by_value=True, required=True)
+    type = fields.Enum(GuestTokenResourceType, by_value=True, required=True)
     id = fields.String(required=True)
 
     @post_load

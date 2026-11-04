@@ -85,12 +85,13 @@ class TrinoEngineSpec(BaseEngineSpec):
     @classmethod
     def adjust_database_uri(
         cls, uri: URL, selected_schema: Optional[str] = None
-    ) -> None:
+    ) -> URL:
         database = uri.database
         if selected_schema and database:
             selected_schema = parse.quote(selected_schema, safe="")
             database = database.split("/")[0] + "/" + selected_schema
-            uri.database = database
+            return uri.set(database=database)
+        return uri
 
     @classmethod
     def update_impersonation_config(
@@ -116,7 +117,7 @@ class TrinoEngineSpec(BaseEngineSpec):
     @classmethod
     def modify_url_for_impersonation(
         cls, url: URL, impersonate_user: bool, username: Optional[str]
-    ) -> None:
+    ) -> URL:
         """
         Modify the SQL Alchemy URL object with the user to impersonate if applicable.
         :param url: SQLAlchemy URL object
@@ -124,6 +125,7 @@ class TrinoEngineSpec(BaseEngineSpec):
         :param username: Effective username
         """
         # Do nothing and let update_impersonation_config take care of impersonation
+        return url
 
     @classmethod
     def get_allow_cost_estimate(cls, extra: Dict[str, Any]) -> bool:

@@ -30,9 +30,9 @@ def test_pivot_df_no_cols_no_rows_single_metric():
     assert (
         df.to_markdown()
         == """
-|    |    SUM(num) |
-|---:|------------:|
-|  0 | 8.06797e+07 |
+|    |   SUM(num) |
+|---:|-----------:|
+|  0 |   80679663 |
     """.strip()
     )
 
@@ -53,7 +53,7 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         == """
 |                  |   ('SUM(num)',) |
 |:-----------------|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |
+| ('Total (Sum)',) |        80679663 |
     """.strip()
     )
 
@@ -75,7 +75,7 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         == """
 |                  |   ('SUM(num)',) |
 |:-----------------|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |
+| ('Total (Sum)',) |        80679663 |
     """.strip()
     )
 
@@ -98,7 +98,7 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         == """
 |               |   ('Total (Sum)',) |
 |:--------------|-------------------:|
-| ('SUM(num)',) |        8.06797e+07 |
+| ('SUM(num)',) |           80679663 |
     """.strip()
     )
 
@@ -120,7 +120,7 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         == """
 |                  |   ('SUM(num)',) |   ('Total (Sum)',) |
 |:-----------------|----------------:|-------------------:|
-| ('Total (Sum)',) |     8.06797e+07 |        8.06797e+07 |
+| ('Total (Sum)',) |        80679663 |           80679663 |
     """.strip()
     )
 
@@ -135,9 +135,9 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
     assert (
         df.to_markdown()
         == """
-|    |    SUM(num) |   MAX(num) |
-|---:|------------:|-----------:|
-|  0 | 8.06797e+07 |      37296 |
+|    |   SUM(num) |   MAX(num) |
+|---:|-----------:|-----------:|
+|  0 |   80679663 |      37296 |
     """.strip()
     )
 
@@ -158,7 +158,7 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         == """
 |                  |   ('SUM(num)',) |   ('MAX(num)',) |
 |:-----------------|----------------:|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |           37296 |
+| ('Total (Sum)',) |        80679663 |           37296 |
     """.strip()
     )
 
@@ -180,7 +180,7 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         == """
 |                  |   ('SUM(num)',) |   ('MAX(num)',) |
 |:-----------------|----------------:|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |           37296 |
+| ('Total (Sum)',) |        80679663 |           37296 |
     """.strip()
     )
 
@@ -203,8 +203,8 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         == """
 |               |   ('Total (Sum)',) |
 |:--------------|-------------------:|
-| ('SUM(num)',) |        8.06797e+07 |
-| ('MAX(num)',) |    37296           |
+| ('SUM(num)',) |           80679663 |
+| ('MAX(num)',) |              37296 |
     """.strip()
     )
 
@@ -227,7 +227,7 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         == """
 |                  |   ('SUM(num)',) |   ('MAX(num)',) |   ('Total (Sum)',) |
 |:-----------------|----------------:|----------------:|-------------------:|
-| ('Total (Sum)',) |     8.06797e+07 |           37296 |         8.0717e+07 |
+| ('Total (Sum)',) |        80679663 |           37296 |           80716959 |
     """.strip()
     )
 
@@ -1358,8 +1358,8 @@ def test_table():
     assert (
         formatted.to_markdown()
         == """
-|    | count      |
-|---:|:-----------|
+|    |      count |
+|---:|-----------:|
 |  0 | 80,679,663 |
     """.strip()
     )

@@ -44,7 +44,7 @@ NUMPY_FUNCTIONS = {
     "min": np.min,
     "percentile": np.percentile,
     "prod": np.prod,
-    "product": np.product,
+    "product": np.prod,
     "std": np.std,
     "sum": np.sum,
     "var": np.var,
@@ -211,7 +211,9 @@ def _append_columns(
     if all(key == value for key, value in columns.items()):
         # make sure to return a new DataFrame instead of changing the `base_df`.
         _base_df = base_df.copy()
-        _base_df.loc[:, columns.keys()] = append_df
+        # assign whole columns so the new dtype (e.g. float after rolling) is kept
+        for column in columns:
+            _base_df[column] = append_df[column]
         return _base_df
     append_df = append_df.rename(columns=columns)
     return pd.concat([base_df, append_df], axis="columns")

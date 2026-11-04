@@ -17,6 +17,7 @@
 import dataclasses
 import functools
 import logging
+import os
 import traceback
 from datetime import datetime
 from typing import Any, Callable, cast, Dict, List, Optional, TYPE_CHECKING, Union
@@ -44,7 +45,6 @@ from flask_babel import get_locale, gettext as __, lazy_gettext as _
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask_wtf.csrf import CSRFError
 from flask_wtf.form import FlaskForm
-from pkg_resources import resource_filename
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from werkzeug.exceptions import HTTPException
@@ -111,6 +111,7 @@ FRONTEND_CONF_KEYS = (
 )
 
 logger = logging.getLogger(__name__)
+SUPERSET_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 config = superset_app.config
 
 
@@ -427,8 +428,8 @@ def show_http_exception(ex: HTTPException) -> FlaskResponse:
         and not config["DEBUG"]
         and ex.code in {404, 500}
     ):
-        path = resource_filename("superset", f"static/assets/{ex.code}.html")
-        return send_file(path, cache_timeout=0), ex.code
+        path = os.path.join(SUPERSET_DIR, "static", "assets", f"{ex.code}.html")
+        return send_file(path, max_age=0), ex.code
 
     return json_errors_response(
         errors=[
@@ -449,8 +450,8 @@ def show_http_exception(ex: HTTPException) -> FlaskResponse:
 def show_command_errors(ex: CommandException) -> FlaskResponse:
     logger.warning(ex)
     if "text/html" in request.accept_mimetypes and not config["DEBUG"]:
-        path = resource_filename("superset", "static/assets/500.html")
-        return send_file(path, cache_timeout=0), 500
+        path = os.path.join(SUPERSET_DIR, "static", "assets", "500.html")
+        return send_file(path, max_age=0), 500
 
     extra = ex.normalized_messages() if isinstance(ex, CommandInvalidError) else {}
     return json_errors_response(
@@ -471,8 +472,8 @@ def show_command_errors(ex: CommandException) -> FlaskResponse:
 def show_unexpected_exception(ex: Exception) -> FlaskResponse:
     logger.exception(ex)
     if "text/html" in request.accept_mimetypes and not config["DEBUG"]:
-        path = resource_filename("superset", "static/assets/500.html")
-        return send_file(path, cache_timeout=0), 500
+        path = os.path.join(SUPERSET_DIR, "static", "assets", "500.html")
+        return send_file(path, max_age=0), 500
 
     return json_errors_response(
         errors=[

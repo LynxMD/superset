@@ -28,10 +28,10 @@ openapi-spec-validator
 openpyxl
 pandas_gbq
 parameterized
-pybigquery
+sqlalchemy-bigquery
 pyfakefs
-pyhive[presto]>=0.6.3
-pylint==2.9.6
+pyhive[presto]>=0.7.0
+pylint
 pytest
 pytest-cov
 statsd

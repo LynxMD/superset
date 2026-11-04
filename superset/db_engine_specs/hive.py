@@ -266,9 +266,10 @@ class HiveEngineSpec(PrestoEngineSpec):
     @classmethod
     def adjust_database_uri(
         cls, uri: URL, selected_schema: Optional[str] = None
-    ) -> None:
+    ) -> URL:
         if selected_schema:
-            uri.database = parse.quote(selected_schema, safe="")
+            return uri.set(database=parse.quote(selected_schema, safe=""))
+        return uri
 
     @classmethod
     def _extract_error_message(cls, ex: Exception) -> str:
@@ -484,7 +485,7 @@ class HiveEngineSpec(PrestoEngineSpec):
     @classmethod
     def modify_url_for_impersonation(
         cls, url: URL, impersonate_user: bool, username: Optional[str]
-    ) -> None:
+    ) -> URL:
         """
         Modify the SQL Alchemy URL object with the user to impersonate if applicable.
         :param url: SQLAlchemy URL object
@@ -493,6 +494,7 @@ class HiveEngineSpec(PrestoEngineSpec):
         """
         # Do nothing in the URL object since instead this should modify
         # the configuraiton dictionary. See get_configuration_for_impersonation
+        return url
 
     @classmethod
     def update_impersonation_config(

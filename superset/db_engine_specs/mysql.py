@@ -161,9 +161,10 @@ class MySQLEngineSpec(BaseEngineSpec, BasicParametersMixin):
     @classmethod
     def adjust_database_uri(
         cls, uri: URL, selected_schema: Optional[str] = None
-    ) -> None:
+    ) -> URL:
         if selected_schema:
-            uri.database = parse.quote(selected_schema, safe="")
+            return uri.set(database=parse.quote(selected_schema, safe=""))
+        return uri
 
     @classmethod
     def get_datatype(cls, type_code: Any) -> Optional[str]:

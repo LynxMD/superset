@@ -906,7 +906,9 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         ]
 
     @classmethod
-    def adjust_database_uri(cls, uri: URL, selected_schema: Optional[str]) -> None:
+    def adjust_database_uri(  # pylint: disable=unused-argument
+        cls, uri: URL, selected_schema: Optional[str]
+    ) -> URL:
         """
         Mutate the database component of the SQLAlchemy URI.
 
@@ -924,7 +926,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
         Some database drivers like presto accept '{catalog}/{schema}' in
         the database component of the URL, that can be handled here.
+
+        SQLAlchemy 1.4 URLs are immutable, so implementations return a new URL.
         """
+        return uri
 
     @classmethod
     def patch(cls) -> None:
@@ -1181,7 +1186,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     @classmethod
     def modify_url_for_impersonation(
         cls, url: URL, impersonate_user: bool, username: Optional[str]
-    ) -> None:
+    ) -> URL:
         """
         Modify the SQL Alchemy URL object with the user to impersonate if applicable.
         :param url: SQLAlchemy URL object
@@ -1189,7 +1194,8 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         :param username: Effective username
         """
         if impersonate_user and username is not None:
-            url.username = username
+            return url.set(username=username)
+        return url
 
     @classmethod
     def update_impersonation_config(
@@ -1577,7 +1583,7 @@ class BasicParametersMixin:
             query.update(cls.encryption_parameters)
 
         return str(
-            URL(
+            URL.create(
                 f"{cls.engine}+{cls.default_driver}".rstrip("+"),  # type: ignore
                 username=parameters.get("username"),
                 password=parameters.get("password"),

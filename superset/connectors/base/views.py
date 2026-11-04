@@ -16,8 +16,8 @@
 # under the License.
 from typing import Any
 
-from flask import Markup
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+from markupsafe import Markup
 
 from superset.connectors.base.models import BaseDatasource
 from superset.exceptions import SupersetException

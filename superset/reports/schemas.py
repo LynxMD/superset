@@ -20,7 +20,6 @@ from croniter import croniter
 from flask_babel import gettext as _
 from marshmallow import fields, Schema, validate, validates_schema
 from marshmallow.validate import Length, Range, ValidationError
-from marshmallow_enum import EnumField
 from pytz import all_timezones
 
 from superset.models.reports import (
@@ -163,7 +162,7 @@ class ReportSchedulePostSchema(Schema):
         description=sql_description, example="SELECT value FROM time_series_table"
     )
     chart = fields.Integer(required=False, allow_none=True)
-    creation_method = EnumField(
+    creation_method = fields.Enum(
         ReportCreationMethodType,
         by_value=True,
         required=False,
@@ -253,7 +252,7 @@ class ReportSchedulePutSchema(Schema):
         allow_none=True,
     )
     chart = fields.Integer(required=False, allow_none=True)
-    creation_method = EnumField(
+    creation_method = fields.Enum(
         ReportCreationMethodType,
         by_value=True,
         allow_none=True,
