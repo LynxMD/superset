@@ -29,9 +29,9 @@ def test_odbc_impersonation(app_context: AppContext) -> None:
 
     from superset.db_engine_specs.drill import DrillEngineSpec
 
-    url = URL("drill+odbc")
+    url = URL.create("drill+odbc")
     username = "DoAsUser"
-    DrillEngineSpec.modify_url_for_impersonation(url, True, username)
+    url = DrillEngineSpec.modify_url_for_impersonation(url, True, username)
     assert url.query["DelegationUID"] == username
 
 
@@ -45,9 +45,9 @@ def test_jdbc_impersonation(app_context: AppContext) -> None:
 
     from superset.db_engine_specs.drill import DrillEngineSpec
 
-    url = URL("drill+jdbc")
+    url = URL.create("drill+jdbc")
     username = "DoAsUser"
-    DrillEngineSpec.modify_url_for_impersonation(url, True, username)
+    url = DrillEngineSpec.modify_url_for_impersonation(url, True, username)
     assert url.query["impersonation_target"] == username
 
 
@@ -61,7 +61,7 @@ def test_sadrill_impersonation(app_context: AppContext) -> None:
 
     from superset.db_engine_specs.drill import DrillEngineSpec
 
-    url = URL("drill+sadrill")
+    url = URL.create("drill+sadrill")
     username = "DoAsUser"
-    DrillEngineSpec.modify_url_for_impersonation(url, True, username)
+    url = DrillEngineSpec.modify_url_for_impersonation(url, True, username)
     assert url.username == username

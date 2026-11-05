@@ -55,7 +55,9 @@ def test_import_dataset(app_context: None, session: Session) -> None:
             "database_name": "examples",
             "import_time": 1606677834,
         },
-        "template_params": {"answer": "42",},
+        "template_params": {
+            "answer": "42",
+        },
         "filter_select_enabled": True,
         "fetch_values_predicate": "foo IN (1, 2)",
         "extra": {"warning_markdown": "*WARNING*"},
@@ -84,7 +86,9 @@ def test_import_dataset(app_context: None, session: Session) -> None:
                 "expression": "revenue-expenses",
                 "description": None,
                 "python_date_format": None,
-                "extra": {"certified_by": "User",},
+                "extra": {
+                    "certified_by": "User",
+                },
             }
         ],
         "database_uuid": database.uuid,
@@ -120,11 +124,12 @@ def test_import_dataset(app_context: None, session: Session) -> None:
     assert len(sqla_table.columns) == 1
     assert sqla_table.columns[0].column_name == "profit"
     assert sqla_table.columns[0].verbose_name is None
-    assert sqla_table.columns[0].is_dttm is None
-    assert sqla_table.columns[0].is_active is None
+    # SQLAlchemy 1.4 applies the column defaults when the imported value is None
+    assert sqla_table.columns[0].is_dttm is False
+    assert sqla_table.columns[0].is_active is True
     assert sqla_table.columns[0].type == "INTEGER"
-    assert sqla_table.columns[0].groupby is None
-    assert sqla_table.columns[0].filterable is None
+    assert sqla_table.columns[0].groupby is True
+    assert sqla_table.columns[0].filterable is True
     assert sqla_table.columns[0].expression == "revenue-expenses"
     assert sqla_table.columns[0].description is None
     assert sqla_table.columns[0].python_date_format is None
@@ -165,7 +170,9 @@ def test_import_column_extra_is_string(app_context: None, session: Session) -> N
             "database_name": "examples",
             "import_time": 1606677834,
         },
-        "template_params": {"answer": "42",},
+        "template_params": {
+            "answer": "42",
+        },
         "filter_select_enabled": True,
         "fetch_values_predicate": "foo IN (1, 2)",
         "extra": '{"warning_markdown": "*WARNING*"}',

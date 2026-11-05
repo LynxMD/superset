@@ -23,7 +23,6 @@ from superset.models.helpers import AuditMixinNullable
 
 
 class UserAttribute(Model, AuditMixinNullable):
-
     """
     Custom attributes attached to the user.
 

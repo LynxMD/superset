@@ -12,9 +12,6 @@ jobs:
   test-mysql:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.8]
     env:
       PYTHONPATH: ${{ github.workspace }}
       SUPERSET_CONFIG: tests.integration_tests.superset_test_config
@@ -35,7 +32,7 @@ jobs:
           - 16379:6379
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           submodules: recursive
@@ -48,9 +45,9 @@ jobs:
         run: ./scripts/ci_check_no_file_changes.sh python
       - name: Setup Python
         if: steps.check.outcome == 'failure'
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
           cache: 'pip'
           cache-dependency-path: 'requirements/testing.txt'
       - name: Install dependencies
@@ -78,9 +75,6 @@ jobs:
   test-postgres:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9]
     env:
       PYTHONPATH: ${{ github.workspace }}
       SUPERSET_CONFIG: tests.integration_tests.superset_test_config
@@ -102,7 +96,7 @@ jobs:
           - 16379:6379
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           submodules: recursive
@@ -115,9 +109,9 @@ jobs:
         run: ./scripts/ci_check_no_file_changes.sh python
       - name: Setup Python
         if: steps.check.outcome == 'failure'
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
           cache: 'pip'
           cache-dependency-path: 'requirements/testing.txt'
       - name: Install dependencies
@@ -145,9 +139,6 @@ jobs:
   test-sqlite:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.8]
     env:
       PYTHONPATH: ${{ github.workspace }}
       SUPERSET_CONFIG: tests.integration_tests.superset_test_config
@@ -161,7 +152,7 @@ jobs:
           - 16379:6379
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           submodules: recursive
@@ -174,9 +165,9 @@ jobs:
         run: ./scripts/ci_check_no_file_changes.sh python
       - name: Setup Python
         if: steps.check.outcome == 'failure'
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
           cache: 'pip'
           cache-dependency-path: 'requirements/testing.txt'
       - name: Install dependencies

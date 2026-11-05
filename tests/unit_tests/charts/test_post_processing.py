@@ -27,14 +27,11 @@ def test_pivot_df_no_cols_no_rows_single_metric():
     # when no cols/rows are selected there are no groupbys in the query,
     # and the data has only the metric(s)
     df = pd.DataFrame.from_dict({"SUM(num)": {0: 80679663}})
-    assert (
-        df.to_markdown()
-        == """
-|    |    SUM(num) |
-|---:|------------:|
-|  0 | 8.06797e+07 |
+    assert df.to_markdown() == """
+|    |   SUM(num) |
+|---:|-----------:|
+|  0 |   80679663 |
     """.strip()
-    )
 
     pivoted = pivot_df(
         df,
@@ -48,14 +45,11 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)',) |
 |:-----------------|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |
+| ('Total (Sum)',) |        80679663 |
     """.strip()
-    )
 
     # tranpose_pivot and combine_metrics do nothing in this case
     pivoted = pivot_df(
@@ -70,14 +64,11 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)',) |
 |:-----------------|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |
+| ('Total (Sum)',) |        80679663 |
     """.strip()
-    )
 
     # apply_metrics_on_rows will pivot the table, moving the metrics
     # to rows
@@ -93,14 +84,11 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |               |   ('Total (Sum)',) |
 |:--------------|-------------------:|
-| ('SUM(num)',) |        8.06797e+07 |
+| ('SUM(num)',) |           80679663 |
     """.strip()
-    )
 
     # showing totals
     pivoted = pivot_df(
@@ -115,14 +103,11 @@ def test_pivot_df_no_cols_no_rows_single_metric():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)',) |   ('Total (Sum)',) |
 |:-----------------|----------------:|-------------------:|
-| ('Total (Sum)',) |     8.06797e+07 |        8.06797e+07 |
+| ('Total (Sum)',) |        80679663 |           80679663 |
     """.strip()
-    )
 
 
 def test_pivot_df_no_cols_no_rows_two_metrics():
@@ -132,14 +117,11 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
     # when no cols/rows are selected there are no groupbys in the query,
     # and the data has only the metrics
     df = pd.DataFrame.from_dict({"SUM(num)": {0: 80679663}, "MAX(num)": {0: 37296}})
-    assert (
-        df.to_markdown()
-        == """
-|    |    SUM(num) |   MAX(num) |
-|---:|------------:|-----------:|
-|  0 | 8.06797e+07 |      37296 |
+    assert df.to_markdown() == """
+|    |   SUM(num) |   MAX(num) |
+|---:|-----------:|-----------:|
+|  0 |   80679663 |      37296 |
     """.strip()
-    )
 
     pivoted = pivot_df(
         df,
@@ -153,14 +135,11 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)',) |   ('MAX(num)',) |
 |:-----------------|----------------:|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |           37296 |
+| ('Total (Sum)',) |        80679663 |           37296 |
     """.strip()
-    )
 
     # tranpose_pivot and combine_metrics do nothing in this case
     pivoted = pivot_df(
@@ -175,14 +154,11 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)',) |   ('MAX(num)',) |
 |:-----------------|----------------:|----------------:|
-| ('Total (Sum)',) |     8.06797e+07 |           37296 |
+| ('Total (Sum)',) |        80679663 |           37296 |
     """.strip()
-    )
 
     # apply_metrics_on_rows will pivot the table, moving the metrics
     # to rows
@@ -198,15 +174,12 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |               |   ('Total (Sum)',) |
 |:--------------|-------------------:|
-| ('SUM(num)',) |        8.06797e+07 |
-| ('MAX(num)',) |    37296           |
+| ('SUM(num)',) |           80679663 |
+| ('MAX(num)',) |              37296 |
     """.strip()
-    )
 
     # when showing totals we only add a column, since adding a row
     # would be redundant
@@ -222,14 +195,11 @@ def test_pivot_df_no_cols_no_rows_two_metrics():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)',) |   ('MAX(num)',) |   ('Total (Sum)',) |
 |:-----------------|----------------:|----------------:|-------------------:|
-| ('Total (Sum)',) |     8.06797e+07 |           37296 |         8.0717e+07 |
+| ('Total (Sum)',) |        80679663 |           37296 |           80716959 |
     """.strip()
-    )
 
 
 def test_pivot_df_single_row_two_metrics():
@@ -243,15 +213,12 @@ def test_pivot_df_single_row_two_metrics():
             "MAX(num)": {0: 2588, 1: 1280},
         }
     )
-    assert (
-        df.to_markdown()
-        == """
+    assert df.to_markdown() == """
 |    | gender   |   SUM(num) |   MAX(num) |
 |---:|:---------|-----------:|-----------:|
 |  0 | girl     |     118065 |       2588 |
 |  1 | boy      |      47123 |       1280 |
     """.strip()
-    )
 
     pivoted = pivot_df(
         df,
@@ -265,15 +232,12 @@ def test_pivot_df_single_row_two_metrics():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |           |   ('SUM(num)',) |   ('MAX(num)',) |
 |:----------|----------------:|----------------:|
 | ('boy',)  |           47123 |            1280 |
 | ('girl',) |          118065 |            2588 |
     """.strip()
-    )
 
     # transpose_pivot
     pivoted = pivot_df(
@@ -288,14 +252,11 @@ def test_pivot_df_single_row_two_metrics():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)', 'boy') |   ('SUM(num)', 'girl') |   ('MAX(num)', 'boy') |   ('MAX(num)', 'girl') |
 |:-----------------|----------------------:|-----------------------:|----------------------:|-----------------------:|
 | ('Total (Sum)',) |                 47123 |                 118065 |                  1280 |                   2588 |
     """.strip()
-    )
 
     # combine_metrics does nothing in this case
     pivoted = pivot_df(
@@ -310,15 +271,12 @@ def test_pivot_df_single_row_two_metrics():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |           |   ('SUM(num)',) |   ('MAX(num)',) |
 |:----------|----------------:|----------------:|
 | ('boy',)  |           47123 |            1280 |
 | ('girl',) |          118065 |            2588 |
     """.strip()
-    )
 
     # show totals
     pivoted = pivot_df(
@@ -333,16 +291,13 @@ def test_pivot_df_single_row_two_metrics():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)',) |   ('MAX(num)',) |   ('Total (Sum)',) |
 |:-----------------|----------------:|----------------:|-------------------:|
 | ('boy',)         |           47123 |            1280 |              48403 |
 | ('girl',)        |          118065 |            2588 |             120653 |
 | ('Total (Sum)',) |          165188 |            3868 |             169056 |
     """.strip()
-    )
 
     # apply_metrics_on_rows
     pivoted = pivot_df(
@@ -357,9 +312,7 @@ def test_pivot_df_single_row_two_metrics():
         show_columns_total=True,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                          |   ('Total (Sum)',) |
 |:-------------------------|-------------------:|
 | ('SUM(num)', 'boy')      |              47123 |
@@ -370,7 +323,6 @@ def test_pivot_df_single_row_two_metrics():
 | ('MAX(num)', 'Subtotal') |               3868 |
 | ('Total (Sum)', '')      |             169056 |
     """.strip()
-    )
 
     # apply_metrics_on_rows with combine_metrics
     pivoted = pivot_df(
@@ -385,9 +337,7 @@ def test_pivot_df_single_row_two_metrics():
         show_columns_total=True,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                      |   ('Total (Sum)',) |
 |:---------------------|-------------------:|
 | ('boy', 'SUM(num)')  |              47123 |
@@ -398,7 +348,6 @@ def test_pivot_df_single_row_two_metrics():
 | ('girl', 'Subtotal') |             120653 |
 | ('Total (Sum)', '')  |             169056 |
     """.strip()
-    )
 
 
 def test_pivot_df_complex():
@@ -479,9 +428,7 @@ def test_pivot_df_complex():
             },
         }
     )
-    assert (
-        df.to_markdown()
-        == """
+    assert df.to_markdown() == """
 |    | state   | gender   | name   |   SUM(num) |   MAX(num) |
 |---:|:--------|:---------|:-------|-----------:|-----------:|
 |  0 | CA      | girl     | Amy    |      45426 |       2227 |
@@ -497,7 +444,6 @@ def test_pivot_df_complex():
 | 10 | FL      | boy      | Tony   |       2673 |        247 |
 | 11 | FL      | girl     | Cindy  |       1218 |        217 |
     """.strip()
-    )
 
     pivoted = pivot_df(
         df,
@@ -511,9 +457,7 @@ def test_pivot_df_complex():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                    |   ('SUM(num)', 'CA') |   ('SUM(num)', 'FL') |   ('MAX(num)', 'CA') |   ('MAX(num)', 'FL') |
 |:-------------------|---------------------:|---------------------:|---------------------:|---------------------:|
 | ('boy', 'Edward')  |                31290 |                 9395 |                 1280 |                  389 |
@@ -523,7 +467,6 @@ def test_pivot_df_complex():
 | ('girl', 'Dawn')   |                11403 |                 5089 |                 1157 |                  461 |
 | ('girl', 'Sophia') |                18859 |                 7181 |                 2588 |                 1187 |
     """.strip()
-    )
 
     # transpose_pivot
     pivoted = pivot_df(
@@ -538,15 +481,12 @@ def test_pivot_df_complex():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |         |   ('SUM(num)', 'boy', 'Edward') |   ('SUM(num)', 'boy', 'Tony') |   ('SUM(num)', 'girl', 'Amy') |   ('SUM(num)', 'girl', 'Cindy') |   ('SUM(num)', 'girl', 'Dawn') |   ('SUM(num)', 'girl', 'Sophia') |   ('MAX(num)', 'boy', 'Edward') |   ('MAX(num)', 'boy', 'Tony') |   ('MAX(num)', 'girl', 'Amy') |   ('MAX(num)', 'girl', 'Cindy') |   ('MAX(num)', 'girl', 'Dawn') |   ('MAX(num)', 'girl', 'Sophia') |
 |:--------|--------------------------------:|------------------------------:|------------------------------:|--------------------------------:|-------------------------------:|---------------------------------:|--------------------------------:|------------------------------:|------------------------------:|--------------------------------:|-------------------------------:|---------------------------------:|
 | ('CA',) |                           31290 |                          3765 |                         45426 |                           14149 |                          11403 |                            18859 |                            1280 |                           598 |                          2227 |                             842 |                           1157 |                             2588 |
 | ('FL',) |                            9395 |                          2673 |                         14740 |                            1218 |                           5089 |                             7181 |                             389 |                           247 |                           854 |                             217 |                            461 |                             1187 |
     """.strip()
-    )
 
     # combine_metrics
     pivoted = pivot_df(
@@ -561,9 +501,7 @@ def test_pivot_df_complex():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                    |   ('CA', 'SUM(num)') |   ('CA', 'MAX(num)') |   ('FL', 'SUM(num)') |   ('FL', 'MAX(num)') |
 |:-------------------|---------------------:|---------------------:|---------------------:|---------------------:|
 | ('boy', 'Edward')  |                31290 |                 1280 |                 9395 |                  389 |
@@ -573,7 +511,6 @@ def test_pivot_df_complex():
 | ('girl', 'Dawn')   |                11403 |                 1157 |                 5089 |                  461 |
 | ('girl', 'Sophia') |                18859 |                 2588 |                 7181 |                 1187 |
     """.strip()
-    )
 
     # show totals
     pivoted = pivot_df(
@@ -588,9 +525,7 @@ def test_pivot_df_complex():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                      |   ('SUM(num)', 'CA') |   ('SUM(num)', 'FL') |   ('SUM(num)', 'Subtotal') |   ('MAX(num)', 'CA') |   ('MAX(num)', 'FL') |   ('MAX(num)', 'Subtotal') |   ('Total (Sum)', '') |
 |:---------------------|---------------------:|---------------------:|---------------------------:|---------------------:|---------------------:|---------------------------:|----------------------:|
 | ('boy', 'Edward')    |                31290 |                 9395 |                      40685 |                 1280 |                  389 |                       1669 |                 42354 |
@@ -603,7 +538,6 @@ def test_pivot_df_complex():
 | ('girl', 'Subtotal') |                89837 |                28228 |                     118065 |                 6814 |                 2719 |                       9533 |                127598 |
 | ('Total (Sum)', '')  |               124892 |                40296 |                     165188 |                 8692 |                 3355 |                      12047 |                177235 |
     """.strip()
-    )
 
     # apply_metrics_on_rows
     pivoted = pivot_df(
@@ -618,9 +552,7 @@ def test_pivot_df_complex():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                                |   ('CA',) |   ('FL',) |
 |:-------------------------------|----------:|----------:|
 | ('SUM(num)', 'boy', 'Edward')  |     31290 |      9395 |
@@ -636,7 +568,6 @@ def test_pivot_df_complex():
 | ('MAX(num)', 'girl', 'Dawn')   |      1157 |       461 |
 | ('MAX(num)', 'girl', 'Sophia') |      2588 |      1187 |
     """.strip()
-    )
 
     # apply_metrics_on_rows with combine_metrics
     pivoted = pivot_df(
@@ -651,9 +582,7 @@ def test_pivot_df_complex():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                                |   ('CA',) |   ('FL',) |
 |:-------------------------------|----------:|----------:|
 | ('boy', 'Edward', 'SUM(num)')  |     31290 |      9395 |
@@ -669,7 +598,6 @@ def test_pivot_df_complex():
 | ('girl', 'Sophia', 'SUM(num)') |     18859 |      7181 |
 | ('girl', 'Sophia', 'MAX(num)') |      2588 |      1187 |
     """.strip()
-    )
 
     # everything
     pivoted = pivot_df(
@@ -684,9 +612,7 @@ def test_pivot_df_complex():
         show_columns_total=True,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                     |   ('boy', 'Edward') |   ('boy', 'Tony') |   ('boy', 'Subtotal') |   ('girl', 'Amy') |   ('girl', 'Cindy') |   ('girl', 'Dawn') |   ('girl', 'Sophia') |   ('girl', 'Subtotal') |   ('Total (Sum)', '') |
 |:--------------------|--------------------:|------------------:|----------------------:|------------------:|--------------------:|-------------------:|---------------------:|-----------------------:|----------------------:|
 | ('CA', 'SUM(num)')  |               31290 |              3765 |                 35055 |             45426 |               14149 |              11403 |                18859 |                  89837 |                124892 |
@@ -697,7 +623,6 @@ def test_pivot_df_complex():
 | ('FL', 'Subtotal')  |                9784 |              2920 |                 12704 |             15594 |                1435 |               5550 |                 8368 |                  30947 |                 43651 |
 | ('Total (Sum)', '') |               42354 |              7283 |                 49637 |             63247 |               16426 |              18110 |                29815 |                 127598 |                177235 |
     """.strip()
-    )
 
     # fraction
     pivoted = pivot_df(
@@ -712,9 +637,7 @@ def test_pivot_df_complex():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                                            |   ('SUM(num)', 'CA') |   ('SUM(num)', 'FL') |   ('MAX(num)', 'CA') |   ('MAX(num)', 'FL') |
 |:-------------------------------------------|---------------------:|---------------------:|---------------------:|---------------------:|
 | ('boy', 'Edward')                          |            0.250536  |            0.23315   |            0.147262  |            0.115946  |
@@ -727,7 +650,6 @@ def test_pivot_df_complex():
 | ('girl', 'Subtotal')                       |            0.719317  |            0.700516  |            0.783939  |            0.810432  |
 | ('Total (Sum as Fraction of Columns)', '') |            1         |            1         |            1         |            1         |
     """.strip()
-    )
 
 
 def test_pivot_df_multi_column():
@@ -807,15 +729,12 @@ def test_pivot_df_multi_column():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)', 'boy') |   ('SUM(num)', 'girl') |   ('MAX(num)', 'boy') |   ('MAX(num)', 'girl') |
 |:-----------------|----------------------:|-----------------------:|----------------------:|-----------------------:|
 | ('CA',)          |                 35055 |                  89837 |                  1878 |                   6814 |
 | ('Total (Sum)',) |                 12068 |                  28228 |                   636 |                   2719 |
     """.strip()
-    )
 
     # transpose_pivot
     pivoted = pivot_df(
@@ -830,9 +749,7 @@ def test_pivot_df_multi_column():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                |   ('SUM(num)',) |   ('MAX(num)',) |
 |:---------------|----------------:|----------------:|
 | ('CA', 'boy')  |           35055 |            1878 |
@@ -840,7 +757,6 @@ def test_pivot_df_multi_column():
 | ('FL', 'boy')  |           12068 |             636 |
 | ('FL', 'girl') |           28228 |            2719 |
     """.strip()
-    )
 
     # combine_metrics
     pivoted = pivot_df(
@@ -855,15 +771,12 @@ def test_pivot_df_multi_column():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('boy', 'SUM(num)') |   ('boy', 'MAX(num)') |   ('girl', 'SUM(num)') |   ('girl', 'MAX(num)') |
 |:-----------------|----------------------:|----------------------:|-----------------------:|-----------------------:|
 | ('CA',)          |                 35055 |                  1878 |                  89837 |                   6814 |
 | ('Total (Sum)',) |                 12068 |                   636 |                  28228 |                   2719 |
     """.strip()
-    )
 
     # show totals
     pivoted = pivot_df(
@@ -878,16 +791,13 @@ def test_pivot_df_multi_column():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                  |   ('SUM(num)', 'boy') |   ('SUM(num)', 'girl') |   ('SUM(num)', 'Subtotal') |   ('MAX(num)', 'boy') |   ('MAX(num)', 'girl') |   ('MAX(num)', 'Subtotal') |   ('Total (Sum)', '') |
 |:-----------------|----------------------:|-----------------------:|---------------------------:|----------------------:|-----------------------:|---------------------------:|----------------------:|
 | ('CA',)          |                 35055 |                  89837 |                     124892 |                  1878 |                   6814 |                       8692 |                133584 |
 | ('Total (Sum)',) |                 12068 |                  28228 |                      40296 |                   636 |                   2719 |                       3355 |                 43651 |
 
     """.strip()
-    )
 
     # apply_metrics_on_rows
     pivoted = pivot_df(
@@ -902,15 +812,12 @@ def test_pivot_df_multi_column():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |               |   ('CA', 'boy') |   ('CA', 'girl') |   ('FL', 'boy') |   ('FL', 'girl') |
 |:--------------|----------------:|-----------------:|----------------:|-----------------:|
 | ('SUM(num)',) |           35055 |            89837 |           12068 |            28228 |
 | ('MAX(num)',) |            1878 |             6814 |             636 |             2719 |
     """.strip()
-    )
 
     # apply_metrics_on_rows with combine_metrics
     pivoted = pivot_df(
@@ -925,15 +832,12 @@ def test_pivot_df_multi_column():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |               |   ('CA', 'boy') |   ('CA', 'girl') |   ('FL', 'boy') |   ('FL', 'girl') |
 |:--------------|----------------:|-----------------:|----------------:|-----------------:|
 | ('SUM(num)',) |           35055 |            89837 |           12068 |            28228 |
 | ('MAX(num)',) |            1878 |             6814 |             636 |             2719 |
     """.strip()
-    )
 
     # everything
     pivoted = pivot_df(
@@ -948,9 +852,7 @@ def test_pivot_df_multi_column():
         show_columns_total=True,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                      |   ('CA',) |   ('Total (Sum)',) |
 |:---------------------|----------:|-------------------:|
 | ('boy', 'SUM(num)')  |     35055 |              12068 |
@@ -961,7 +863,6 @@ def test_pivot_df_multi_column():
 | ('girl', 'Subtotal') |     96651 |              30947 |
 | ('Total (Sum)', '')  |    133584 |              43651 |
     """.strip()
-    )
 
     # fraction
     pivoted = pivot_df(
@@ -976,15 +877,12 @@ def test_pivot_df_multi_column():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                                         |   ('SUM(num)', 'boy') |   ('SUM(num)', 'girl') |   ('MAX(num)', 'boy') |   ('MAX(num)', 'girl') |
 |:----------------------------------------|----------------------:|-----------------------:|----------------------:|-----------------------:|
 | ('CA',)                                 |              0.743904 |               0.760911 |              0.747017 |                0.71478 |
 | ('Total (Sum as Fraction of Columns)',) |              0.256096 |               0.239089 |              0.252983 |                0.28522 |
     """.strip()
-    )
 
 
 def test_pivot_df_complex_null_values():
@@ -1065,9 +963,7 @@ def test_pivot_df_complex_null_values():
             },
         }
     )
-    assert (
-        df.to_markdown()
-        == """
+    assert df.to_markdown() == """
 |    | state   | gender   | name   |   SUM(num) |   MAX(num) |
 |---:|:--------|:---------|:-------|-----------:|-----------:|
 |  0 |         | girl     | Amy    |      45426 |       2227 |
@@ -1083,7 +979,6 @@ def test_pivot_df_complex_null_values():
 | 10 |         | boy      | Tony   |       2673 |        247 |
 | 11 |         | girl     | Cindy  |       1218 |        217 |
     """.strip()
-    )
 
     pivoted = pivot_df(
         df,
@@ -1097,9 +992,7 @@ def test_pivot_df_complex_null_values():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                    |   ('SUM(num)', 'NULL') |   ('MAX(num)', 'NULL') |
 |:-------------------|-----------------------:|-----------------------:|
 | ('boy', 'Edward')  |                  40685 |                   1669 |
@@ -1110,7 +1003,6 @@ def test_pivot_df_complex_null_values():
 | ('girl', 'Sophia') |                  26040 |                   3775 |
 
     """.strip()
-    )
 
     # transpose_pivot
     pivoted = pivot_df(
@@ -1125,14 +1017,11 @@ def test_pivot_df_complex_null_values():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |           |   ('SUM(num)', 'boy', 'Edward') |   ('SUM(num)', 'boy', 'Tony') |   ('SUM(num)', 'girl', 'Amy') |   ('SUM(num)', 'girl', 'Cindy') |   ('SUM(num)', 'girl', 'Dawn') |   ('SUM(num)', 'girl', 'Sophia') |   ('MAX(num)', 'boy', 'Edward') |   ('MAX(num)', 'boy', 'Tony') |   ('MAX(num)', 'girl', 'Amy') |   ('MAX(num)', 'girl', 'Cindy') |   ('MAX(num)', 'girl', 'Dawn') |   ('MAX(num)', 'girl', 'Sophia') |
 |:----------|--------------------------------:|------------------------------:|------------------------------:|--------------------------------:|-------------------------------:|---------------------------------:|--------------------------------:|------------------------------:|------------------------------:|--------------------------------:|-------------------------------:|---------------------------------:|
 | ('NULL',) |                           40685 |                          6438 |                         60166 |                           15367 |                          16492 |                            26040 |                            1669 |                           845 |                          3081 |                            1059 |                           1618 |                             3775 |
     """.strip()
-    )
 
     # combine_metrics
     pivoted = pivot_df(
@@ -1147,9 +1036,7 @@ def test_pivot_df_complex_null_values():
         show_columns_total=False,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                    |   ('NULL', 'SUM(num)') |   ('NULL', 'MAX(num)') |
 |:-------------------|-----------------------:|-----------------------:|
 | ('boy', 'Edward')  |                  40685 |                   1669 |
@@ -1159,7 +1046,6 @@ def test_pivot_df_complex_null_values():
 | ('girl', 'Dawn')   |                  16492 |                   1618 |
 | ('girl', 'Sophia') |                  26040 |                   3775 |
  """.strip()
-    )
 
     # show totals
     pivoted = pivot_df(
@@ -1174,9 +1060,7 @@ def test_pivot_df_complex_null_values():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                      |   ('SUM(num)', 'NULL') |   ('SUM(num)', 'Subtotal') |   ('MAX(num)', 'NULL') |   ('MAX(num)', 'Subtotal') |   ('Total (Sum)', '') |
 |:---------------------|-----------------------:|---------------------------:|-----------------------:|---------------------------:|----------------------:|
 | ('boy', 'Edward')    |                  40685 |                      40685 |                   1669 |                       1669 |                 42354 |
@@ -1189,7 +1073,6 @@ def test_pivot_df_complex_null_values():
 | ('girl', 'Subtotal') |                 118065 |                     118065 |                   9533 |                       9533 |                127598 |
 | ('Total (Sum)', '')  |                 165188 |                     165188 |                  12047 |                      12047 |                177235 |
   """.strip()
-    )
 
     # apply_metrics_on_rows
     pivoted = pivot_df(
@@ -1204,9 +1087,7 @@ def test_pivot_df_complex_null_values():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                                |   ('NULL',) |
 |:-------------------------------|------------:|
 | ('SUM(num)', 'boy', 'Edward')  |       40685 |
@@ -1222,7 +1103,6 @@ def test_pivot_df_complex_null_values():
 | ('MAX(num)', 'girl', 'Dawn')   |        1618 |
 | ('MAX(num)', 'girl', 'Sophia') |        3775 |
     """.strip()
-    )
 
     # apply_metrics_on_rows with combine_metrics
     pivoted = pivot_df(
@@ -1237,9 +1117,7 @@ def test_pivot_df_complex_null_values():
         show_columns_total=False,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                                |   ('NULL',) |
 |:-------------------------------|------------:|
 | ('boy', 'Edward', 'SUM(num)')  |       40685 |
@@ -1255,7 +1133,6 @@ def test_pivot_df_complex_null_values():
 | ('girl', 'Sophia', 'SUM(num)') |       26040 |
 | ('girl', 'Sophia', 'MAX(num)') |        3775 |
     """.strip()
-    )
 
     # everything
     pivoted = pivot_df(
@@ -1270,9 +1147,7 @@ def test_pivot_df_complex_null_values():
         show_columns_total=True,
         apply_metrics_on_rows=True,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                      |   ('boy', 'Edward') |   ('boy', 'Tony') |   ('boy', 'Subtotal') |   ('girl', 'Amy') |   ('girl', 'Cindy') |   ('girl', 'Dawn') |   ('girl', 'Sophia') |   ('girl', 'Subtotal') |   ('Total (Sum)', '') |
 |:---------------------|--------------------:|------------------:|----------------------:|------------------:|--------------------:|-------------------:|---------------------:|-----------------------:|----------------------:|
 | ('NULL', 'SUM(num)') |               40685 |              6438 |                 47123 |             60166 |               15367 |              16492 |                26040 |                 118065 |                165188 |
@@ -1280,7 +1155,6 @@ def test_pivot_df_complex_null_values():
 | ('NULL', 'Subtotal') |               42354 |              7283 |                 49637 |             63247 |               16426 |              18110 |                29815 |                 127598 |                177235 |
 | ('Total (Sum)', '')  |               42354 |              7283 |                 49637 |             63247 |               16426 |              18110 |                29815 |                 127598 |                177235 |
     """.strip()
-    )
 
     # fraction
     pivoted = pivot_df(
@@ -1295,9 +1169,7 @@ def test_pivot_df_complex_null_values():
         show_columns_total=True,
         apply_metrics_on_rows=False,
     )
-    assert (
-        pivoted.to_markdown()
-        == """
+    assert pivoted.to_markdown() == """
 |                                            |   ('SUM(num)', 'NULL') |   ('MAX(num)', 'NULL') |
 |:-------------------------------------------|-----------------------:|-----------------------:|
 | ('boy', 'Edward')                          |              0.246295  |              0.138541  |
@@ -1310,7 +1182,6 @@ def test_pivot_df_complex_null_values():
 | ('girl', 'Subtotal')                       |              0.714731  |              0.791317  |
 | ('Total (Sum as Fraction of Columns)', '') |              1         |              1         |
     """.strip()
-    )
 
 
 def test_table():
@@ -1355,11 +1226,8 @@ def test_table():
         "viz_type": "table",
     }
     formatted = table(df, form_data)
-    assert (
-        formatted.to_markdown()
-        == """
-|    | count      |
-|---:|:-----------|
+    assert formatted.to_markdown() == """
+|    |      count |
+|---:|-----------:|
 |  0 | 80,679,663 |
     """.strip()
-    )

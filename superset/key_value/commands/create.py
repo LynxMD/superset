@@ -79,9 +79,9 @@ class CreateKeyValueCommand(BaseCommand):
             resource=self.resource.value,
             value=pickle.dumps(self.value),
             created_on=datetime.now(),
-            created_by_fk=None
-            if self.actor is None or self.actor.is_anonymous
-            else self.actor.id,
+            created_by_fk=(
+                None if self.actor is None or self.actor.is_anonymous else self.actor.id
+            ),
             expires_on=self.expires_on,
         )
         if self.key is not None:

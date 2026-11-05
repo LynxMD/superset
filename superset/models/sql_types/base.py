@@ -40,6 +40,7 @@ def literal_dttm_type_factory(
     :param db_extra: The database extra object
     :return: SQLAlchemy type that supports using datetima as literal bind
     """
+
     # pylint: disable=too-few-public-methods
     class TemporalWrapperType(type(sqla_type)):  # type: ignore
         # pylint: disable=unused-argument

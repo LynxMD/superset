@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """Unit tests for Superset"""
+
 from unittest import mock
 
 import pytest
@@ -34,7 +35,8 @@ from tests.integration_tests.fixtures.birth_names_dashboard import (
 
 
 @mock.patch.dict(
-    "superset.extensions.feature_flag_manager._feature_flags", EMBEDDED_SUPERSET=True,
+    "superset.extensions.feature_flag_manager._feature_flags",
+    EMBEDDED_SUPERSET=True,
 )
 class TestGuestUserSecurity(SupersetTestCase):
     # This test doesn't use a dashboard fixture, the next test does.
@@ -150,7 +152,8 @@ class TestGuestUserSecurity(SupersetTestCase):
 
 
 @mock.patch.dict(
-    "superset.extensions.feature_flag_manager._feature_flags", EMBEDDED_SUPERSET=True,
+    "superset.extensions.feature_flag_manager._feature_flags",
+    EMBEDDED_SUPERSET=True,
 )
 @pytest.mark.usefixtures("load_birth_names_dashboard_with_slices")
 class TestGuestUserDashboardAccess(SupersetTestCase):

@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """Fixtures for test_datasource.py"""
+
 from typing import Any, Dict
 
 from superset.utils.core import get_example_default_schema

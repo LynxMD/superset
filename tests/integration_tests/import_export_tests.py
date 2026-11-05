@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 import json
 import unittest
 from tests.integration_tests.fixtures.birth_names_dashboard import (
@@ -287,8 +288,10 @@ class TestImportExport(SupersetTestCase):
         self.login("admin")
         birth_dash = self.get_dash_by_slug("births")
         world_health_dash = self.get_dash_by_slug("world_health")
-        export_dash_url = "/dashboard/export_dashboards_form?id={}&id={}&action=go".format(
-            birth_dash.id, world_health_dash.id
+        export_dash_url = (
+            "/dashboard/export_dashboards_form?id={}&id={}&action=go".format(
+                birth_dash.id, world_health_dash.id
+            )
         )
         resp = self.client.get(export_dash_url)
         resp_data = json.loads(resp.data.decode("utf-8"), object_hook=decode_dashboards)
@@ -396,9 +399,7 @@ class TestImportExport(SupersetTestCase):
                 }}
               }}
             }}
-        """.format(
-            slc.id
-        )
+        """.format(slc.id)
         imported_dash_id = import_dashboard(dash_with_1_slice, import_time=1990)
         imported_dash = self.get_dash(imported_dash_id)
 
@@ -600,9 +601,7 @@ class TestImportExport(SupersetTestCase):
                     }}
                 }}
                 }}
-            """.format(
-            slc.id
-        )
+            """.format(slc.id)
         return dash_with_1_slice
 
     def test_import_table_no_metadata(self):

@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """Loads datasets, dashboards and slices in a new superset instance"""
+
 import json
 import textwrap
 
@@ -43,8 +44,7 @@ def load_tabbed_dashboard(_: bool = False) -> None:
     tabbed_dash_slices.add("Treemap")
     tabbed_dash_slices.add("Box plot")
 
-    js = textwrap.dedent(
-        """\
+    js = textwrap.dedent("""\
     {
       "CHART-c0EjR-OZ0n": {
         "children": [],
@@ -323,8 +323,7 @@ def load_tabbed_dashboard(_: bool = False) -> None:
         "type": "TABS"
       }
     }
-        """
-    )
+        """)
     pos = json.loads(js)
     slices = [
         db.session.query(Slice).filter_by(slice_name=name).first()

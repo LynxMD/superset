@@ -14,8 +14,9 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-#  type: ignore
+# type: ignore
 """Unit tests for Superset"""
+
 import json
 from unittest.mock import patch
 

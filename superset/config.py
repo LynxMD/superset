@@ -20,8 +20,8 @@ All configuration in this file can be overridden by providing a superset_config
 in your PYTHONPATH as there is a ``from superset_config import *``
 at the end of this file.
 """
+
 # pylint: disable=too-many-lines
-import imp  # pylint: disable=deprecated-module
 import importlib.util
 import json
 import logging
@@ -32,7 +32,6 @@ from collections import OrderedDict
 from datetime import timedelta
 from typing import Any, Callable, Dict, List, Optional, Type, TYPE_CHECKING, Union
 
-import pkg_resources
 from cachelib.base import BaseCache
 from celery.schedules import crontab
 from dateutil import tz
@@ -64,7 +63,7 @@ EVENT_LOGGER = DBEventLogger()
 
 SUPERSET_LOG_VIEW = True
 
-BASE_DIR = pkg_resources.resource_filename("superset", "")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if "SUPERSET_HOME" in os.environ:
     DATA_DIR = os.environ["SUPERSET_HOME"]
 else:
@@ -73,12 +72,8 @@ else:
 # ---------------------------------------------------------
 # Superset specific config
 # ---------------------------------------------------------
-VERSION_INFO_FILE = pkg_resources.resource_filename(
-    "superset", "static/version_info.json"
-)
-PACKAGE_JSON_FILE = pkg_resources.resource_filename(
-    "superset", "static/assets/package.json"
-)
+VERSION_INFO_FILE = os.path.join(BASE_DIR, "static", "version_info.json")
+PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "static", "assets", "package.json")
 
 # Multiple favicons can be specified here. The "href" property
 # is mandatory, but "sizes," "type," and "rel" are optional.
@@ -477,9 +472,9 @@ IS_FEATURE_ENABLED_FUNC: Optional[Callable[[str, Optional[bool]], bool]] = None
 #
 # Takes as a parameter the common bootstrap payload before transformations.
 # Returns a dict containing data that should be added or overridden to the payload.
-COMMON_BOOTSTRAP_OVERRIDES_FUNC: Callable[
-    [Dict[str, Any]], Dict[str, Any]
-] = lambda data: {}  # default: empty dict
+COMMON_BOOTSTRAP_OVERRIDES_FUNC: Callable[[Dict[str, Any]], Dict[str, Any]] = (
+    lambda data: {}
+)  # default: empty dict
 
 # EXTRA_CATEGORICAL_COLOR_SCHEMES is used for adding custom categorical color schemes
 # example code for "My custom warm to hot" color scheme
@@ -910,9 +905,9 @@ UPLOADED_CSV_HIVE_NAMESPACE: Optional[str] = None
 
 # mypy doesn't catch that if case ensures list content being always str
 ALLOWED_USER_CSV_SCHEMA_FUNC: Callable[["Database", "models.User"], List[str]] = (
-    lambda database, user: [UPLOADED_CSV_HIVE_NAMESPACE]
-    if UPLOADED_CSV_HIVE_NAMESPACE
-    else []
+    lambda database, user: (
+        [UPLOADED_CSV_HIVE_NAMESPACE] if UPLOADED_CSV_HIVE_NAMESPACE else []
+    )
 )
 
 # Values that should be treated as nulls for the csv uploads.
@@ -1133,7 +1128,9 @@ WEBDRIVER_WINDOW = {
 WEBDRIVER_AUTH_FUNC = None
 
 # Any config options to be passed as-is to the webdriver
-WEBDRIVER_CONFIGURATION: Dict[Any, Any] = {"service_log_path": "/dev/null"}
+# selenium>=4.10: settings under "service" go to the driver's ``Service`` class,
+# and "binary_location" sets the browser binary on the options
+WEBDRIVER_CONFIGURATION: Dict[Any, Any] = {"service": {"log_output": "/dev/null"}}
 
 # Additional args to be passed as arguments to the config object
 # Note: these options are Chrome-specific. For FF, these should
@@ -1330,7 +1327,12 @@ if CONFIG_PATH_ENV_VAR in os.environ:
     cfg_path = os.environ[CONFIG_PATH_ENV_VAR]
     try:
         module = sys.modules[__name__]
-        override_conf = imp.load_source("superset_config", cfg_path)
+        spec = importlib.util.spec_from_file_location("superset_config", cfg_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Cannot load config from {cfg_path}")
+        override_conf = importlib.util.module_from_spec(spec)
+        sys.modules["superset_config"] = override_conf
+        spec.loader.exec_module(override_conf)
         for key in dir(override_conf):
             if key.isupper():
                 setattr(module, key, getattr(override_conf, key))
@@ -1345,7 +1347,7 @@ elif importlib.util.find_spec("superset_config") and not is_test():
     try:
         # pylint: disable=import-error,wildcard-import,unused-wildcard-import
         import superset_config
-        from superset_config import *  # type:ignore
+        from superset_config import *  # type: ignore
 
         print(f"Loaded your LOCAL configuration at [{superset_config.__file__}]")
     except Exception:

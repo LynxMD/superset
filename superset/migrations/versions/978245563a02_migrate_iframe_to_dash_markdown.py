@@ -21,6 +21,7 @@ Revises: f2672aa8350a
 Create Date: 2020-08-12 00:24:39.617899
 
 """
+
 import collections
 import json
 import logging
@@ -159,7 +160,10 @@ def upgrade():
                 for key_to_remove in keys_to_remove:
                     del position_dict[key_to_remove]
                 dashboard.position_json = json.dumps(
-                    position_dict, indent=None, separators=(",", ":"), sort_keys=True,
+                    position_dict,
+                    indent=None,
+                    separators=(",", ":"),
+                    sort_keys=True,
                 )
                 session.merge(dashboard)
 

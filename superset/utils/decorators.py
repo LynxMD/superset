@@ -86,7 +86,7 @@ def on_security_exception(self: Any, ex: Exception) -> Response:
 
 # noinspection PyPackageRequirements
 def check_dashboard_access(
-    on_error: Callable[..., Any] = on_security_exception
+    on_error: Callable[..., Any] = on_security_exception,
 ) -> Callable[..., Any]:
     def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(f)

@@ -763,7 +763,7 @@ class DatabaseRestApi(BaseSupersetModelRestApi):
             buf,
             mimetype="application/zip",
             as_attachment=True,
-            attachment_filename=filename,
+            download_name=filename,
         )
         if token:
             response.set_cookie(token, "done", max_age=600)
@@ -881,7 +881,10 @@ class DatabaseRestApi(BaseSupersetModelRestApi):
         database = DatabaseDAO.find_by_id(pk)
         if not database:
             return self.response_404()
-        return self.response(200, function_names=database.function_names,)
+        return self.response(
+            200,
+            function_names=database.function_names,
+        )
 
     @expose("/available/", methods=["GET"])
     @protect()

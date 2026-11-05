@@ -35,6 +35,7 @@ if [ ${1} == "local" ]; then
   docker build --no-cache \
         -t apache-superset:${SUPERSET_VERSION_RC} \
         -f Dockerfile.from_local_tarball . \
+        --build-arg PY_VER="$(cat ../.python-version)" \
         --build-arg VERSION=${SUPERSET_VERSION_RC} \
         --build-arg SUPERSET_BUILD_FROM=local \
         --build-arg SUPERSET_RELEASE_RC_TARBALL="${SUPERSET_TMP_TARBALL_FILENAME}"
@@ -44,6 +45,7 @@ else
   docker build --no-cache \
         -t apache-superset:${SUPERSET_VERSION_RC} \
         -f Dockerfile.from_svn_tarball . \
+        --build-arg PY_VER="$(cat ../.python-version)" \
         --build-arg VERSION=${SUPERSET_VERSION_RC} \
         --build-arg SUPERSET_BUILD_FROM=svn
 fi

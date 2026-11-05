@@ -35,8 +35,7 @@ def load_misc_dashboard() -> None:
 
     if not dash:
         dash = Dashboard()
-    js = textwrap.dedent(
-        """\
+    js = textwrap.dedent("""\
 {
     "CHART-BkeVbh8ANQ": {
         "children": [],
@@ -208,8 +207,7 @@ def load_misc_dashboard() -> None:
     },
     "DASHBOARD_VERSION_KEY": "v2"
 }
-    """
-    )
+    """)
     pos = json.loads(js)
     slices = (
         db.session.query(Slice).filter(Slice.slice_name.in_(misc_dash_slices)).all()

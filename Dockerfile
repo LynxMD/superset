@@ -18,19 +18,25 @@
 ######################################################################
 # PY stage that simply does a pip install on our requirements
 ######################################################################
-ARG PY_VER=3.8.12
+# The Python version comes from .python-version, the single source. Build scripts
+# pass it in, e.g. `docker build --build-arg PY_VER=$(cat .python-version) .`
+ARG PY_VER
 FROM python:${PY_VER} AS superset-py
 
 RUN mkdir /app \
         && apt-get update -y \
         && apt-get install -y --no-install-recommends \
             build-essential \
+            cargo \
             default-libmysqlclient-dev \
             libpq-dev \
             libsasl2-dev \
             libecpg-dev \
+            pkg-config \
         && rm -rf /var/lib/apt/lists/*
 
+# cargo builds python-geohash>=0.9 on platforms without a prebuilt wheel
+# (e.g. linux/arm64); pkg-config lets mysqlclient>=2.2 find libmysqlclient.
 # First, we just wanna install requirements, which will allow us to utilize the cache
 # in order to only build if and only if requirements change
 COPY ./requirements/*.txt  /app/requirements/
@@ -45,9 +51,9 @@ RUN cd /app \
 ######################################################################
 # Node stage to deal with static asset construction
 ######################################################################
-FROM node:16 AS superset-node
+FROM node:26 AS superset-node
 
-ARG NPM_VER=7
+ARG NPM_VER=11
 RUN npm install -g npm@${NPM_VER}
 
 ARG NPM_BUILD_CMD="build"
@@ -71,8 +77,8 @@ RUN cd /app/superset-frontend \
 ######################################################################
 # Final lean image...
 ######################################################################
-ARG PY_VER=3.8.12
 FROM python:${PY_VER} AS lean
+ARG PY_VER
 
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -93,7 +99,7 @@ RUN mkdir -p ${PYTHONPATH} \
             libecpg-dev \
         && rm -rf /var/lib/apt/lists/*
 
-COPY --from=superset-py /usr/local/lib/python3.8/site-packages/ /usr/local/lib/python3.8/site-packages/
+COPY --from=superset-py /usr/local/lib/python${PY_VER}/site-packages/ /usr/local/lib/python${PY_VER}/site-packages/
 # Copying site-packages doesn't move the CLIs, so let's copy them one by one
 COPY --from=superset-py /usr/local/bin/gunicorn /usr/local/bin/celery /usr/local/bin/flask /usr/bin/
 COPY --from=superset-node /app/superset/static/assets /app/superset/static/assets

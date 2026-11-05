@@ -205,7 +205,11 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             types.BigInteger(),
             GenericDataType.NUMERIC,
         ),
-        (re.compile(r"^long", re.IGNORECASE), types.Float(), GenericDataType.NUMERIC,),
+        (
+            re.compile(r"^long", re.IGNORECASE),
+            types.Float(),
+            GenericDataType.NUMERIC,
+        ),
         (
             re.compile(r"^decimal", re.IGNORECASE),
             types.Numeric(),
@@ -216,13 +220,21 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             types.Numeric(),
             GenericDataType.NUMERIC,
         ),
-        (re.compile(r"^float", re.IGNORECASE), types.Float(), GenericDataType.NUMERIC,),
+        (
+            re.compile(r"^float", re.IGNORECASE),
+            types.Float(),
+            GenericDataType.NUMERIC,
+        ),
         (
             re.compile(r"^double", re.IGNORECASE),
             types.Float(),
             GenericDataType.NUMERIC,
         ),
-        (re.compile(r"^real", re.IGNORECASE), types.REAL, GenericDataType.NUMERIC,),
+        (
+            re.compile(r"^real", re.IGNORECASE),
+            types.REAL,
+            GenericDataType.NUMERIC,
+        ),
         (
             re.compile(r"^smallserial", re.IGNORECASE),
             types.SmallInteger(),
@@ -258,7 +270,11 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             types.DateTime(),
             GenericDataType.TEMPORAL,
         ),
-        (re.compile(r"^time", re.IGNORECASE), types.Time(), GenericDataType.TEMPORAL,),
+        (
+            re.compile(r"^time", re.IGNORECASE),
+            types.Time(),
+            GenericDataType.TEMPORAL,
+        ),
         (
             re.compile(r"^interval", re.IGNORECASE),
             types.Interval(),
@@ -316,9 +332,9 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     max_column_name_length = 0
     try_remove_schema_from_table_name = True  # pylint: disable=invalid-name
     run_multiple_statements_as_one = False
-    custom_errors: Dict[
-        Pattern[str], Tuple[str, SupersetErrorType, Dict[str, Any]]
-    ] = {}
+    custom_errors: Dict[Pattern[str], Tuple[str, SupersetErrorType, Dict[str, Any]]] = (
+        {}
+    )
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> Dict[Type[Exception], Type[Exception]]:
@@ -351,7 +367,8 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def get_allow_cost_estimate(  # pylint: disable=unused-argument
-        cls, extra: Dict[str, Any],
+        cls,
+        extra: Dict[str, Any],
     ) -> bool:
         return False
 
@@ -618,7 +635,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def extra_table_metadata(  # pylint: disable=unused-argument
-        cls, database: "Database", table_name: str, schema_name: str,
+        cls,
+        database: "Database",
+        table_name: str,
+        schema_name: str,
     ) -> Dict[str, Any]:
         """
         Returns engine-specific table metadata
@@ -906,7 +926,9 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         ]
 
     @classmethod
-    def adjust_database_uri(cls, uri: URL, selected_schema: Optional[str]) -> None:
+    def adjust_database_uri(  # pylint: disable=unused-argument
+        cls, uri: URL, selected_schema: Optional[str]
+    ) -> URL:
         """
         Mutate the database component of the SQLAlchemy URI.
 
@@ -924,7 +946,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
         Some database drivers like presto accept '{catalog}/{schema}' in
         the database component of the URL, that can be handled here.
+
+        SQLAlchemy 1.4 URLs are immutable, so implementations return a new URL.
         """
+        return uri
 
     @classmethod
     def patch(cls) -> None:
@@ -944,7 +969,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def get_table_names(  # pylint: disable=unused-argument
-        cls, database: "Database", inspector: Inspector, schema: Optional[str],
+        cls,
+        database: "Database",
+        inspector: Inspector,
+        schema: Optional[str],
     ) -> List[str]:
         """
         Get all tables from schema
@@ -961,7 +989,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def get_view_names(  # pylint: disable=unused-argument
-        cls, database: "Database", inspector: Inspector, schema: Optional[str],
+        cls,
+        database: "Database",
+        inspector: Inspector,
+        schema: Optional[str],
     ) -> List[str]:
         """
         Get all views from schema
@@ -1181,7 +1212,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     @classmethod
     def modify_url_for_impersonation(
         cls, url: URL, impersonate_user: bool, username: Optional[str]
-    ) -> None:
+    ) -> URL:
         """
         Modify the SQL Alchemy URL object with the user to impersonate if applicable.
         :param url: SQLAlchemy URL object
@@ -1189,11 +1220,15 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         :param username: Effective username
         """
         if impersonate_user and username is not None:
-            url.username = username
+            return url.set(username=username)
+        return url
 
     @classmethod
     def update_impersonation_config(
-        cls, connect_args: Dict[str, Any], uri: str, username: Optional[str],
+        cls,
+        connect_args: Dict[str, Any],
+        uri: str,
+        username: Optional[str],
     ) -> None:
         """
         Update a configuration dictionary
@@ -1207,7 +1242,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def execute(  # pylint: disable=unused-argument
-        cls, cursor: Any, query: str, **kwargs: Any,
+        cls,
+        cursor: Any,
+        query: str,
+        **kwargs: Any,
     ) -> None:
         """
         Execute a SQL query
@@ -1333,7 +1371,8 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def get_function_names(  # pylint: disable=unused-argument
-        cls, database: "Database",
+        cls,
+        database: "Database",
     ) -> List[str]:
         """
         Get a list of function names that are able to be called on the database.
@@ -1471,7 +1510,9 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def get_cancel_query_id(  # pylint: disable=unused-argument
-        cls, cursor: Any, query: Query,
+        cls,
+        cursor: Any,
+        query: Query,
     ) -> Optional[str]:
         """
         Select identifiers from the database engine that uniquely identifies the
@@ -1487,7 +1528,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     def cancel_query(  # pylint: disable=unused-argument
-        cls, cursor: Any, query: Query, cancel_query_id: str,
+        cls,
+        cursor: Any,
+        query: Query,
+        cancel_query_id: str,
     ) -> bool:
         """
         Cancel query in the underlying database.
@@ -1515,7 +1559,7 @@ class BasicParametersSchema(Schema):
     port = fields.Integer(
         required=True,
         description=__("Database port"),
-        validate=Range(min=0, max=2 ** 16, max_inclusive=False),
+        validate=Range(min=0, max=2**16, max_inclusive=False),
     )
     database = fields.String(required=True, description=__("Database name"))
     query = fields.Dict(
@@ -1577,7 +1621,7 @@ class BasicParametersMixin:
             query.update(cls.encryption_parameters)
 
         return str(
-            URL(
+            URL.create(
                 f"{cls.engine}+{cls.default_driver}".rstrip("+"),  # type: ignore
                 username=parameters.get("username"),
                 password=parameters.get("password"),
@@ -1665,7 +1709,7 @@ class BasicParametersMixin:
                     extra={"invalid": ["port"]},
                 ),
             )
-        if not (isinstance(port, int) and 0 <= port < 2 ** 16):
+        if not (isinstance(port, int) and 0 <= port < 2**16):
             errors.append(
                 SupersetError(
                     message=(

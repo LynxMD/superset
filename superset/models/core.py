@@ -16,13 +16,13 @@
 # under the License.
 # pylint: disable=line-too-long
 """A collection of ORM sqlalchemy models for Superset"""
+
 import enum
 import json
 import logging
 import textwrap
 from ast import literal_eval
 from contextlib import closing
-from copy import deepcopy
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type
 
@@ -82,7 +82,6 @@ class Url(Model, AuditMixinNullable):
 
 
 class KeyValue(Model):  # pylint: disable=too-few-public-methods
-
     """Used for any type of key-value store"""
 
     __tablename__ = "keyvalue"
@@ -107,7 +106,6 @@ class ConfigurationMethod(str, enum.Enum):
 class Database(
     Model, AuditMixinNullable, ImportExportMixin
 ):  # pylint: disable=too-many-public-methods
-
     """An ORM object that stores Database related information"""
 
     __tablename__ = "dbs"
@@ -137,16 +135,14 @@ class Database(
     )
     extra = Column(
         Text,
-        default=textwrap.dedent(
-            """\
+        default=textwrap.dedent("""\
     {
         "metadata_params": {},
         "engine_params": {},
         "metadata_cache_timeout": {},
         "schemas_allowed_for_file_upload": []
     }
-    """
-        ),
+    """),
     )
     encrypted_extra = Column(encrypted_field_factory.create(Text), nullable=True)
     impersonate_user = Column(Boolean, default=False)
@@ -308,21 +304,22 @@ class Database(
 
     @classmethod
     def get_password_masked_url(cls, masked_url: URL) -> URL:
-        url_copy = deepcopy(masked_url)
-        if url_copy.password is not None:
-            url_copy.password = PASSWORD_MASK
-        return url_copy
+        if masked_url.password is not None:
+            return masked_url.set(password=PASSWORD_MASK)
+        return masked_url
 
     def set_sqlalchemy_uri(self, uri: str) -> None:
         conn = sqla.engine.url.make_url(uri.strip())
         if conn.password != PASSWORD_MASK and not custom_password_store:
             # do not over-write the password with the password mask
             self.password = conn.password
-        conn.password = PASSWORD_MASK if conn.password else None
+        conn = conn.set(password=PASSWORD_MASK if conn.password else None)
         self.sqlalchemy_uri = str(conn)  # hides the password
 
     def get_effective_user(
-        self, object_url: URL, user_name: Optional[str] = None,
+        self,
+        object_url: URL,
+        user_name: Optional[str] = None,
     ) -> Optional[str]:
         """
         Get the effective user, especially during impersonation.
@@ -360,12 +357,12 @@ class Database(
     ) -> Engine:
         extra = self.get_extra()
         sqlalchemy_url = make_url(self.sqlalchemy_uri_decrypted)
-        self.db_engine_spec.adjust_database_uri(sqlalchemy_url, schema)
+        sqlalchemy_url = self.db_engine_spec.adjust_database_uri(sqlalchemy_url, schema)
         effective_username = self.get_effective_user(sqlalchemy_url, user_name)
         # If using MySQL or Presto for example, will set url.username
         # If using Hive, will not do anything yet since that relies on a
         # configuration parameter instead.
-        self.db_engine_spec.modify_url_for_impersonation(
+        sqlalchemy_url = self.db_engine_spec.modify_url_for_impersonation(
             sqlalchemy_url, self.impersonate_user, effective_username
         )
 
@@ -727,9 +724,9 @@ class Database(
             # (so users see 500 less often)
             return "dialect://invalid_uri"
         if custom_password_store:
-            conn.password = custom_password_store(conn)
+            conn = conn.set(password=custom_password_store(conn))
         else:
-            conn.password = self.password
+            conn = conn.set(password=self.password)
         return str(conn)
 
     @property
@@ -790,7 +787,6 @@ sqla.event.listen(Database, "after_update", security_manager.set_perm)
 
 
 class Log(Model):  # pylint: disable=too-few-public-methods
-
     """ORM object used to log Superset actions to the database"""
 
     __tablename__ = "logs"

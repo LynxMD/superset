@@ -44,7 +44,7 @@ NUMPY_FUNCTIONS = {
     "min": np.min,
     "percentile": np.percentile,
     "prod": np.prod,
-    "product": np.product,
+    "product": np.prod,
     "std": np.std,
     "sum": np.sum,
     "var": np.var,
@@ -148,7 +148,8 @@ def validate_column_args(*argnames: str) -> Callable[..., Any]:
 
 
 def _get_aggregate_funcs(
-    df: DataFrame, aggregates: Dict[str, Dict[str, Any]],
+    df: DataFrame,
+    aggregates: Dict[str, Dict[str, Any]],
 ) -> Dict[str, NamedAgg]:
     """
     Converts a set of aggregate config objects into functions that pandas can use as
@@ -170,7 +171,10 @@ def _get_aggregate_funcs(
             )
         if "operator" not in agg_obj:
             raise InvalidPostProcessingError(
-                _("Operator undefined for aggregator: %(name)s", name=name,)
+                _(
+                    "Operator undefined for aggregator: %(name)s",
+                    name=name,
+                )
             )
         operator = agg_obj["operator"]
         if callable(operator):
@@ -179,7 +183,10 @@ def _get_aggregate_funcs(
             func = NUMPY_FUNCTIONS.get(operator)
             if not func:
                 raise InvalidPostProcessingError(
-                    _("Invalid numpy function: %(operator)s", operator=operator,)
+                    _(
+                        "Invalid numpy function: %(operator)s",
+                        operator=operator,
+                    )
                 )
             options = agg_obj.get("options", {})
             aggfunc = partial(func, **options)
@@ -211,7 +218,9 @@ def _append_columns(
     if all(key == value for key, value in columns.items()):
         # make sure to return a new DataFrame instead of changing the `base_df`.
         _base_df = base_df.copy()
-        _base_df.loc[:, columns.keys()] = append_df
+        # assign whole columns so the new dtype (e.g. float after rolling) is kept
+        for column in columns:
+            _base_df[column] = append_df[column]
         return _base_df
     append_df = append_df.rename(columns=columns)
     return pd.concat([base_df, append_df], axis="columns")

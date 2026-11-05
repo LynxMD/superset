@@ -12,12 +12,9 @@ jobs:
   python-lint:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.8]
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           submodules: recursive
@@ -30,9 +27,9 @@ jobs:
         run: ./scripts/ci_check_no_file_changes.sh python
       - name: Setup Python
         if: steps.check.outcome == 'failure'
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
           cache: 'pip'
           cache-dependency-path: 'requirements/testing.txt'
       - name: Install dependencies
@@ -52,19 +49,16 @@ jobs:
   pre-commit:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.8]
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           submodules: recursive
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
           cache: 'pip'
           cache-dependency-path: |
             requirements/base.txt
@@ -84,19 +78,16 @@ jobs:
   babel-extract:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.8]
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           submodules: recursive
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
           cache: 'pip'
           cache-dependency-path: 'requirements/base.txt'
       - name: Install dependencies

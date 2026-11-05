@@ -342,9 +342,11 @@ class BaseDatasource(
                 )
             else:
                 _columns = [
-                    utils.get_column_name(column)
-                    if utils.is_adhoc_column(column)
-                    else column
+                    (
+                        utils.get_column_name(column)
+                        if utils.is_adhoc_column(column)
+                        else column
+                    )
                     for column_param in COLUMN_FORM_DATA_PARAMS
                     for column in utils.get_iterable(form_data.get(column_param) or [])
                 ]

@@ -55,7 +55,8 @@ SUPERSET_RELEASE_RC_TARBALL_PATH="${SUPERSET_SVN_DEV_PATH}"/"${SUPERSET_VERSION_
 DOCKER_SVN_PATH="/docker_svn"
 
 # Building docker that will produce a tarball
-docker build -t apache-builder -f Dockerfile.make_tarball .
+docker build -t apache-builder -f Dockerfile.make_tarball \
+      --build-arg PY_VER="$(cat ../.python-version)" .
 
 # Running docker to produce a tarball
 docker run \

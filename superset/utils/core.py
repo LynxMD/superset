@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """Utility functions used across Superset"""
+
 # pylint: disable=too-many-lines
 import _thread
 import collections
@@ -33,7 +34,6 @@ import traceback
 import uuid
 import zlib
 from datetime import date, datetime, time, timedelta
-from distutils.util import strtobool
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -70,13 +70,12 @@ import numpy as np
 import pandas as pd
 import sqlalchemy as sa
 from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.backends.openssl.x509 import _Certificate
-from flask import current_app, flash, g, Markup, render_template, request
+from flask import current_app, flash, g, render_template, request
 from flask_appbuilder import SQLA
 from flask_appbuilder.security.sqla.models import Role, User
 from flask_babel import gettext as __
 from flask_babel.speaklater import LazyString
+from markupsafe import Markup
 from pandas.api.types import infer_dtype
 from pandas.core.dtypes.common import is_numeric_dtype
 from sqlalchemy import event, exc, inspect, select, Text
@@ -357,7 +356,6 @@ try:
                 }
             }
 
-
 except NameError:
     pass
 
@@ -513,7 +511,9 @@ def format_timedelta(time_delta: timedelta) -> str:
     return str(time_delta)
 
 
-def base_json_conv(obj: Any,) -> Any:  # pylint: disable=inconsistent-return-statements
+def base_json_conv(  # pylint: disable=inconsistent-return-statements
+    obj: Any,
+) -> Any:
     if isinstance(obj, memoryview):
         obj = obj.tobytes()
     if isinstance(obj, np.int64):
@@ -1014,7 +1014,8 @@ def zlib_decompress(blob: bytes, decode: Optional[bool] = True) -> Union[bytes, 
 
 
 def simple_filter_to_adhoc(
-    filter_clause: QueryObjectFilterClause, clause: str = "where",
+    filter_clause: QueryObjectFilterClause,
+    clause: str = "where",
 ) -> AdhocFilterClause:
     result: AdhocFilterClause = {
         "clause": clause.upper(),
@@ -1277,7 +1278,8 @@ def get_metric_name(
 
 
 def get_column_names(
-    columns: Optional[Sequence[Column]], verbose_map: Optional[Dict[str, Any]] = None,
+    columns: Optional[Sequence[Column]],
+    verbose_map: Optional[Dict[str, Any]] = None,
 ) -> List[str]:
     return [
         column
@@ -1287,7 +1289,8 @@ def get_column_names(
 
 
 def get_metric_names(
-    metrics: Optional[Sequence[Metric]], verbose_map: Optional[Dict[str, Any]] = None,
+    metrics: Optional[Sequence[Metric]],
+    verbose_map: Optional[Dict[str, Any]] = None,
 ) -> List[str]:
     return [
         metric
@@ -1297,7 +1300,8 @@ def get_metric_names(
 
 
 def get_first_metric_name(
-    metrics: Optional[Sequence[Metric]], verbose_map: Optional[Dict[str, Any]] = None,
+    metrics: Optional[Sequence[Metric]],
+    verbose_map: Optional[Dict[str, Any]] = None,
 ) -> Optional[str]:
     metric_labels = get_metric_names(metrics, verbose_map)
     return metric_labels[0] if metric_labels else None
@@ -1393,7 +1397,7 @@ def get_username() -> Optional[str]:
         return None
 
 
-def parse_ssl_cert(certificate: str) -> _Certificate:
+def parse_ssl_cert(certificate: str) -> x509.Certificate:
     """
     Parses the contents of a certificate and returns a valid certificate object
     if valid.
@@ -1403,9 +1407,7 @@ def parse_ssl_cert(certificate: str) -> _Certificate:
     :raises CertificateException: If certificate is not valid/unparseable
     """
     try:
-        return x509.load_pem_x509_certificate(
-            certificate.encode("utf-8"), default_backend()
-        )
+        return x509.load_pem_x509_certificate(certificate.encode("utf-8"))
     except ValueError as ex:
         raise CertificateException("Invalid certificate") from ex
 
@@ -1571,7 +1573,8 @@ def get_column_names_from_metrics(metrics: List[Metric]) -> List[str]:
 
 
 def extract_dataframe_dtypes(
-    df: pd.DataFrame, datasource: Optional["BaseDatasource"] = None,
+    df: pd.DataFrame,
+    datasource: Optional["BaseDatasource"] = None,
 ) -> List[GenericDataType]:
     """Serialize pandas/numpy dtypes to generic types"""
 
@@ -1627,12 +1630,34 @@ def indexed(
     return idx
 
 
+def strtobool(val: str) -> bool:
+    """
+    Convert a string representation of truth to True or False.
+
+    This replaces ``distutils.util.strtobool``; Python 3.12 removed distutils.
+
+    >>> strtobool("yes")
+    True
+    >>> strtobool("off")
+    False
+
+    :raises ValueError: if ``val`` is not a known truth value
+    """
+    val = val.lower()
+    if val in ("y", "yes", "t", "true", "on", "1"):
+        return True
+    if val in ("n", "no", "f", "false", "off", "0"):
+        return False
+    raise ValueError(f"invalid truth value {val!r}")
+
+
 def is_test() -> bool:
     return strtobool(os.environ.get("SUPERSET_TESTENV", "false"))
 
 
 def get_time_filter_status(
-    datasource: "BaseDatasource", applied_time_extras: Dict[str, str],
+    datasource: "BaseDatasource",
+    applied_time_extras: Dict[str, str],
 ) -> Tuple[List[Dict[str, str]], List[Dict[str, str]]]:
     temporal_columns = {col.column_name for col in datasource.columns if col.is_dttm}
     applied: List[Dict[str, str]] = []
@@ -1786,7 +1811,10 @@ def parse_boolean_string(bool_str: Optional[str]) -> bool:
         return False
 
 
-def apply_max_row_limit(limit: int, max_limit: Optional[int] = None,) -> int:
+def apply_max_row_limit(
+    limit: int,
+    max_limit: Optional[int] = None,
+) -> int:
     """
     Override row limit if max global limit is defined
 

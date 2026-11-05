@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 from datetime import datetime, timedelta
 import json
 import random
@@ -88,9 +89,11 @@ class TestQueryApi(SupersetTestCase):
                         self.get_random_string(),
                         sql=f"SELECT col1, col2 from table{cx}",
                         rows=cx,
-                        status=QueryStatus.SUCCESS
-                        if (cx % 2) == 0
-                        else QueryStatus.RUNNING,
+                        status=(
+                            QueryStatus.SUCCESS
+                            if (cx % 2) == 0
+                            else QueryStatus.RUNNING
+                        ),
                     )
                 )
             queries.append(

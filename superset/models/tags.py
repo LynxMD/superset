@@ -37,7 +37,6 @@ Session = sessionmaker(autoflush=False)
 
 
 class TagTypes(enum.Enum):
-
     """
     Types for tags.
 
@@ -57,7 +56,6 @@ class TagTypes(enum.Enum):
 
 
 class ObjectTypes(enum.Enum):
-
     """Object types."""
 
     # pylint: disable=invalid-name
@@ -67,7 +65,6 @@ class ObjectTypes(enum.Enum):
 
 
 class Tag(Model, AuditMixinNullable):
-
     """A tag attached to an object (query, chart or dashboard)."""
 
     __tablename__ = "tag"
@@ -77,7 +74,6 @@ class Tag(Model, AuditMixinNullable):
 
 
 class TaggedObject(Model, AuditMixinNullable):
-
     """An association between an object and a tag."""
 
     __tablename__ = "tagged_object"

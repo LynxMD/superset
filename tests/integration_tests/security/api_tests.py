@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Tests for security api methods"""
+
 import json
 
 import jwt

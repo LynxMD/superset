@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 """a collection of model-related helper classes and functions"""
+
 import json
 import logging
 import re
@@ -28,11 +29,12 @@ import pandas as pd
 import pytz
 import sqlalchemy as sa
 import yaml
-from flask import escape, g, Markup
+from flask import g
 from flask_appbuilder import Model
 from flask_appbuilder.models.decorators import renders
 from flask_appbuilder.models.mixins import AuditMixin
 from flask_appbuilder.security.sqla.models import User
+from markupsafe import escape, Markup
 from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapper, Session
@@ -435,7 +437,6 @@ class AuditMixinNullable(AuditMixin):
 
 
 class QueryResult:  # pylint: disable=too-few-public-methods
-
     """Object returned by the query interface"""
 
     def __init__(  # pylint: disable=too-many-arguments

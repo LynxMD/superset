@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 import json
 import unittest
 from datetime import datetime
@@ -33,7 +34,6 @@ from superset.connectors.druid.views import (
 )
 
 from .base_tests import SupersetTestCase
-
 
 try:
     from superset.connectors.druid.models import (
@@ -110,7 +110,6 @@ DruidCluster.get_druid_version = lambda _: "0.9.1"  # type: ignore
 
 
 class TestDruid(SupersetTestCase):
-
     """Testing interactions with Druid"""
 
     @classmethod

@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 import json
 from typing import Optional
 
@@ -28,7 +29,6 @@ from superset.models.core import Log
 from superset.views.log.api import LogRestApi
 
 from .base_tests import SupersetTestCase
-
 
 EXPECTED_COLUMNS = [
     "action",
@@ -77,7 +77,7 @@ class TestLogApi(SupersetTestCase):
 
     def test_get_list(self):
         """
-            Log API: Test get list
+        Log API: Test get list
         """
         admin_user = self.get_user("admin")
         log = self.insert_log("some_action", admin_user)
@@ -95,7 +95,7 @@ class TestLogApi(SupersetTestCase):
 
     def test_get_list_not_allowed(self):
         """
-            Log API: Test get list
+        Log API: Test get list
         """
         admin_user = self.get_user("admin")
         log = self.insert_log("action", admin_user)
@@ -109,7 +109,7 @@ class TestLogApi(SupersetTestCase):
 
     def test_get_item(self):
         """
-            Log API: Test get item
+        Log API: Test get item
         """
         admin_user = self.get_user("admin")
         log = self.insert_log("some_action", admin_user)
@@ -127,7 +127,7 @@ class TestLogApi(SupersetTestCase):
 
     def test_delete_log(self):
         """
-            Log API: Test delete (does not exist)
+        Log API: Test delete (does not exist)
         """
         admin_user = self.get_user("admin")
         log = self.insert_log("action", admin_user)
@@ -140,7 +140,7 @@ class TestLogApi(SupersetTestCase):
 
     def test_update_log(self):
         """
-            Log API: Test update (does not exist)
+        Log API: Test update (does not exist)
         """
         admin_user = self.get_user("admin")
         log = self.insert_log("action", admin_user)

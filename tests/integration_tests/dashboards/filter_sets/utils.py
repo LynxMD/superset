@@ -90,7 +90,7 @@ def get_filter_set_by_dashboard_id(dashboard_id: int) -> FilterSet:
 
 
 def collect_all_ids(
-    filtersets: Union[Dict[str, List[FilterSet]], List[FilterSet]]
+    filtersets: Union[Dict[str, List[FilterSet]], List[FilterSet]],
 ) -> Set[int]:
     if isinstance(filtersets, dict):
         filtersets_lists: List[List[FilterSet]] = list(filtersets.values())

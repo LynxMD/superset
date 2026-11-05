@@ -19,7 +19,7 @@ jobs:
         echo "Comment on PR #${{ github.event.issue.number }} by ${{ github.event.issue.user.login }}, ${{ github.event.comment.author_association }}"
 
     - name: Eval comment body for /testenv slash command
-      uses: actions/github-script@v3
+      uses: actions/github-script@v9
       id: eval-body
       with:
         result-encoding: string
@@ -29,7 +29,7 @@ jobs:
           return result === null ? 'noop' : result[1]
 
     - name: Eval comment body for feature flags
-      uses: actions/github-script@v3
+      uses: actions/github-script@v9
       id: eval-feature-flags
       with:
         script: |
@@ -49,12 +49,12 @@ jobs:
         steps.eval-body.outputs.result != 'noop' &&
         github.event.comment.author_association != 'MEMBER' &&
         github.event.comment.author_association != 'OWNER'
-      uses: actions/github-script@v3
+      uses: actions/github-script@v9
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
           const errMsg = '@${{ github.event.comment.user.login }} Ephemeral environment creation is currently limited to committers.'
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number: ${{ github.event.issue.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -69,12 +69,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
       with:
         persist-credentials: false
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -82,7 +82,7 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
     - name: Check target image exists in ECR
       id: check-image
@@ -95,12 +95,12 @@ jobs:
 
     - name: Fail on missing container image
       if: steps.check-image.outcome == 'failure'
-      uses: actions/github-script@v3
+      uses: actions/github-script@v9
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
           const errMsg = '@${{ github.event.comment.user.login }} Container image not yet published for this PR. Please try again when build is complete.'
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number: ${{ github.event.issue.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -144,7 +144,7 @@ jobs:
 
     - name: Deploy Amazon ECS task definition
       id: deploy-task
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: pr-${{ github.event.issue.number }}-service
@@ -169,11 +169,11 @@ jobs:
 
     - name: Comment (success)
       if: ${{ success() }}
-      uses: actions/github-script@v3
+      uses: actions/github-script@v9
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number: ${{ github.event.issue.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -182,11 +182,11 @@ jobs:
 
     - name: Comment (failure)
       if: ${{ failure() }}
-      uses: actions/github-script@v3
+      uses: actions/github-script@v9
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number: ${{ github.event.issue.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,

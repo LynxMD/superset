@@ -27,17 +27,18 @@ at all. The classes here will use a common interface to specify all this.
 
 The general idea is to use static classes and an inheritance scheme.
 """
+
 import inspect
 import logging
 import pkgutil
 from collections import defaultdict
 from importlib import import_module
+from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any, Dict, List, Set, Type
 
 import sqlalchemy.databases
 import sqlalchemy.dialects
-from pkg_resources import iter_entry_points
 from sqlalchemy.engine.default import DefaultDialect
 
 from superset.db_engine_specs.base import BaseEngineSpec
@@ -67,11 +68,11 @@ def load_engine_specs() -> List[Type[BaseEngineSpec]]:
         )
 
     # load additional engines from external modules
-    for ep in iter_entry_points("superset.db_engine_specs"):
+    for ep in entry_points(group="superset.db_engine_specs"):
         try:
             engine_spec = ep.load()
         except Exception:  # pylint: disable=broad-except
-            logger.warning("Unable to load Superset DB engine spec: %s", engine_spec)
+            logger.warning("Unable to load Superset DB engine spec: %s", ep.name)
             continue
         engine_specs.append(engine_spec)
 
@@ -129,7 +130,7 @@ def get_available_engine_specs() -> Dict[Type[BaseEngineSpec], Set[str]]:
                 drivers[attr].add(attribute.dialect.driver)
 
     # installed 3rd-party dialects
-    for ep in iter_entry_points("sqlalchemy.dialects"):
+    for ep in entry_points(group="sqlalchemy.dialects"):
         try:
             dialect = ep.load()
         except Exception as ex:  # pylint: disable=broad-except

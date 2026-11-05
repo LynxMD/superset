@@ -22,7 +22,6 @@ from flask import current_app
 from flask_babel import lazy_gettext as _
 from marshmallow import EXCLUDE, fields, pre_load, Schema, validates_schema
 from marshmallow.validate import Length, ValidationError
-from marshmallow_enum import EnumField
 from sqlalchemy import MetaData
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
@@ -236,7 +235,7 @@ class DatabaseParametersSchemaMixin:  # pylint: disable=too-few-public-methods
         values=fields.Raw(),
         description="DB-specific parameters for configuration",
     )
-    configuration_method = EnumField(
+    configuration_method = fields.Enum(
         ConfigurationMethod,
         by_value=True,
         description=configuration_method_description,
@@ -308,7 +307,12 @@ def get_engine_spec(engine: Optional[str]) -> Type[BaseEngineSpec]:
     engine_specs = get_engine_specs()
     if engine not in engine_specs:
         raise ValidationError(
-            [_('Engine "%(engine)s" is not a valid engine.', engine=engine,)]
+            [
+                _(
+                    'Engine "%(engine)s" is not a valid engine.',
+                    engine=engine,
+                )
+            ]
         )
     return engine_specs[engine]
 
@@ -324,7 +328,9 @@ class DatabaseValidateParametersSchema(Schema):
         description="DB-specific parameters for configuration",
     )
     database_name = fields.String(
-        description=database_name_description, allow_none=True, validate=Length(1, 250),
+        description=database_name_description,
+        allow_none=True,
+        validate=Length(1, 250),
     )
     impersonate_user = fields.Boolean(description=impersonate_user_description)
     extra = fields.String(description=extra_description, validate=extra_validator)
@@ -338,7 +344,7 @@ class DatabaseValidateParametersSchema(Schema):
         allow_none=True,
         validate=server_cert_validator,
     )
-    configuration_method = EnumField(
+    configuration_method = fields.Enum(
         ConfigurationMethod,
         by_value=True,
         required=True,
@@ -351,7 +357,9 @@ class DatabasePostSchema(Schema, DatabaseParametersSchemaMixin):
         unknown = EXCLUDE
 
     database_name = fields.String(
-        description=database_name_description, required=True, validate=Length(1, 250),
+        description=database_name_description,
+        required=True,
+        validate=Length(1, 250),
     )
     cache_timeout = fields.Integer(
         description=cache_timeout_description, allow_none=True
@@ -395,7 +403,9 @@ class DatabasePutSchema(Schema, DatabaseParametersSchemaMixin):
         unknown = EXCLUDE
 
     database_name = fields.String(
-        description=database_name_description, allow_none=True, validate=Length(1, 250),
+        description=database_name_description,
+        allow_none=True,
+        validate=Length(1, 250),
     )
     cache_timeout = fields.Integer(
         description=cache_timeout_description, allow_none=True
@@ -436,7 +446,9 @@ class DatabasePutSchema(Schema, DatabaseParametersSchemaMixin):
 
 class DatabaseTestConnectionSchema(Schema, DatabaseParametersSchemaMixin):
     database_name = fields.String(
-        description=database_name_description, allow_none=True, validate=Length(1, 250),
+        description=database_name_description,
+        allow_none=True,
+        validate=Length(1, 250),
     )
     impersonate_user = fields.Boolean(description=impersonate_user_description)
     extra = fields.String(description=extra_description, validate=extra_validator)

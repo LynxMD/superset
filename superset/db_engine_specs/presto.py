@@ -22,7 +22,6 @@ import time
 from collections import defaultdict, deque
 from contextlib import closing
 from datetime import datetime
-from distutils.version import StrictVersion
 from typing import Any, cast, Dict, List, Optional, Pattern, Tuple, TYPE_CHECKING, Union
 from urllib import parse
 
@@ -30,10 +29,11 @@ import pandas as pd
 import simplejson as json
 from flask import current_app
 from flask_babel import gettext as __, lazy_gettext as _
+from packaging.version import Version
 from sqlalchemy import Column, literal_column, types
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.engine.reflection import Inspector
-from sqlalchemy.engine.result import RowProxy
+from sqlalchemy.engine.result import Row as ResultRow
 from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import ColumnClause, Select
@@ -210,11 +210,14 @@ class PrestoEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-metho
     @classmethod
     def get_allow_cost_estimate(cls, extra: Dict[str, Any]) -> bool:
         version = extra.get("version")
-        return version is not None and StrictVersion(version) >= StrictVersion("0.319")
+        return version is not None and Version(version) >= Version("0.319")
 
     @classmethod
     def update_impersonation_config(
-        cls, connect_args: Dict[str, Any], uri: str, username: Optional[str],
+        cls,
+        connect_args: Dict[str, Any],
+        uri: str,
+        username: Optional[str],
     ) -> None:
         """
         Update a configuration dictionary
@@ -416,7 +419,7 @@ class PrestoEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-metho
     @classmethod
     def _show_columns(
         cls, inspector: Inspector, table_name: str, schema: Optional[str]
-    ) -> List[RowProxy]:
+    ) -> List[ResultRow]:
         """
         Show presto column names
         :param inspector: object that performs database schema inspection
@@ -487,7 +490,11 @@ class PrestoEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-metho
             types.VARBINARY(),
             GenericDataType.STRING,
         ),
-        (re.compile(r"^json.*", re.IGNORECASE), types.JSON(), GenericDataType.STRING,),
+        (
+            re.compile(r"^json.*", re.IGNORECASE),
+            types.JSON(),
+            GenericDataType.STRING,
+        ),
         (
             re.compile(r"^date.*", re.IGNORECASE),
             types.DATETIME(),
@@ -711,7 +718,7 @@ class PrestoEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-metho
     @classmethod
     def adjust_database_uri(
         cls, uri: URL, selected_schema: Optional[str] = None
-    ) -> None:
+    ) -> URL:
         database = uri.database
         if selected_schema and database:
             selected_schema = parse.quote(selected_schema, safe="")
@@ -719,7 +726,8 @@ class PrestoEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-metho
                 database = database.split("/")[0] + "/" + selected_schema
             else:
                 database += "/" + selected_schema
-            uri.database = database
+            return uri.set(database=database)
+        return uri
 
     @classmethod
     def convert_dttm(
@@ -1043,19 +1051,16 @@ class PrestoEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-metho
         # Default to the new syntax if version is unset.
         partition_select_clause = (
             f'SELECT * FROM "{table_name}$partitions"'
-            if not presto_version
-            or StrictVersion(presto_version) >= StrictVersion("0.199")
+            if not presto_version or Version(presto_version) >= Version("0.199")
             else f"SHOW PARTITIONS FROM {table_name}"
         )
 
-        sql = textwrap.dedent(
-            f"""\
+        sql = textwrap.dedent(f"""\
             {partition_select_clause}
             {where_clause}
             {order_by_clause}
             {limit_clause}
-        """
-        )
+        """)
         return sql
 
     @classmethod

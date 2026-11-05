@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from pyhive.hive import Cursor
     from TCLIService.ttypes import TFetchOrientation
 
+
 # TODO: contribute back to pyhive.
 def fetch_logs(  # pylint: disable=protected-access
     self: "Cursor",

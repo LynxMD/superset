@@ -72,7 +72,8 @@ ma_plugin = MarshmallowPlugin()
 
 class BigQueryParametersSchema(Schema):
     credentials_info = EncryptedString(
-        required=False, description="Contents of BigQuery JSON credentials.",
+        required=False,
+        description="Contents of BigQuery JSON credentials.",
     )
     query = fields.Dict(required=False)
 
@@ -337,9 +338,9 @@ class BigQueryEngineSpec(BaseEngineSpec):
         creds = engine.dialect.credentials_info
 
         if creds:
-            to_gbq_kwargs[
-                "credentials"
-            ] = service_account.Credentials.from_service_account_info(creds)
+            to_gbq_kwargs["credentials"] = (
+                service_account.Credentials.from_service_account_info(creds)
+            )
 
         # Only pass through supported kwargs.
         supported_kwarg_keys = {"if_exists"}

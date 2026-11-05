@@ -15,16 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 """A collection of ORM sqlalchemy models for SQL Lab"""
+
 import re
 from datetime import datetime
 from typing import Any, Dict, List
 
 import simplejson as json
 import sqlalchemy as sqla
-from flask import Markup
 from flask_appbuilder import Model
 from flask_appbuilder.models.decorators import renders
 from humanize import naturaltime
+from markupsafe import Markup
 from sqlalchemy import (
     Boolean,
     Column,
@@ -218,13 +219,11 @@ class SavedQuery(Model, AuditMixinNullable, ExtraJSONMixin, ImportExportMixin):
 
     @property
     def pop_tab_link(self) -> Markup:
-        return Markup(
-            f"""
+        return Markup(f"""
             <a href="/superset/sqllab?savedQueryId={self.id}">
                 <i class="fa fa-link"></i>
             </a>
-        """
-        )
+        """)
 
     @property
     def user_email(self) -> str:

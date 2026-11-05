@@ -17,6 +17,7 @@
 """
 DEPRECATION NOTICE: this module is deprecated and will be removed on 2.0.
 """
+
 import logging
 from io import IOBase
 from typing import cast, Optional, Union
@@ -54,7 +55,8 @@ def deliver_slack_msg(
         assert response["file"], str(response)  # the uploaded file
     else:
         response = cast(
-            SlackResponse, client.chat_postMessage(channel=slack_channel, text=body),
+            SlackResponse,
+            client.chat_postMessage(channel=slack_channel, text=body),
         )
         assert response["message"]["text"], str(response)
     logger.info("Sent the report to the slack %s", slack_channel)

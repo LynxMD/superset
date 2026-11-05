@@ -66,28 +66,27 @@ def test_parse_sql_multi_statement(app_context: AppContext) -> None:
     "original,expected",
     [
         (
-            dedent(
-                """
+            dedent("""
 with currency as
 (
 select 'INR' as cur
 )
 select * from currency
-"""
-            ),
+"""),
             None,
         ),
-        ("SELECT 1 as cnt", None,),
         (
-            dedent(
-                """
+            "SELECT 1 as cnt",
+            None,
+        ),
+        (
+            dedent("""
 select 'INR' as cur
 union
 select 'AUD' as cur
 union
 select 'USD' as cur
-"""
-            ),
+"""),
             None,
         ),
     ],

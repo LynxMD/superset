@@ -41,7 +41,6 @@ from superset.models.dashboard import dashboard_slices
 
 
 class ImportDashboardsCommand(ImportModelsCommand):
-
     """Import dashboards"""
 
     dao = DashboardDAO

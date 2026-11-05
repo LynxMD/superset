@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 
 class UpdateTemporaryCacheCommand(BaseCommand, ABC):
     def __init__(
-        self, cmd_params: CommandParameters,
+        self,
+        cmd_params: CommandParameters,
     ):
         self._parameters = cmd_params
 
@@ -44,5 +45,4 @@ class UpdateTemporaryCacheCommand(BaseCommand, ABC):
         pass
 
     @abstractmethod
-    def update(self, cmd_params: CommandParameters) -> Optional[str]:
-        ...
+    def update(self, cmd_params: CommandParameters) -> Optional[str]: ...

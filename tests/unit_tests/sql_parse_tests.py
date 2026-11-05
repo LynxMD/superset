@@ -100,9 +100,7 @@ def test_extract_tables_subselect() -> None:
     """
     Test that tables inside subselects are parsed correctly.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT sub.*
 FROM (
     SELECT *
@@ -110,14 +108,9 @@ FROM (
         WHERE day_of_week = 'Friday'
     ) sub, s2.t2
 WHERE sub.resolution = 'NONE'
-"""
-        )
-        == {Table("t1", "s1"), Table("t2", "s2")}
-    )
+""") == {Table("t1", "s1"), Table("t2", "s2")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT sub.*
 FROM (
     SELECT *
@@ -125,14 +118,9 @@ FROM (
     WHERE day_of_week = 'Friday'
 ) sub
 WHERE sub.resolution = 'NONE'
-"""
-        )
-        == {Table("t1", "s1")}
-    )
+""") == {Table("t1", "s1")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT * FROM t1
 WHERE s11 > ANY (
     SELECT COUNT(*) /* no hint */ FROM t2
@@ -143,10 +131,7 @@ WHERE s11 > ANY (
         )
     )
 )
-"""
-        )
-        == {Table("t1"), Table("t2"), Table("t3"), Table("t4")}
-    )
+""") == {Table("t1"), Table("t2"), Table("t3"), Table("t4")}
 
 
 def test_extract_tables_select_in_expression() -> None:
@@ -217,30 +202,20 @@ def test_extract_tables_select_array() -> None:
     """
     Test that queries selecting arrays work as expected.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT ARRAY[1, 2, 3] AS my_array
 FROM t1 LIMIT 10
-"""
-        )
-        == {Table("t1")}
-    )
+""") == {Table("t1")}
 
 
 def test_extract_tables_select_if() -> None:
     """
     Test that queries with an ``IF`` work as expected.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT IF(CARDINALITY(my_array) >= 3, my_array[3], NULL)
 FROM t1 LIMIT 10
-"""
-        )
-        == {Table("t1")}
-    )
+""") == {Table("t1")}
 
 
 def test_extract_tables_with_catalog() -> None:
@@ -284,38 +259,23 @@ def test_extract_tables_where_subquery() -> None:
     """
     Test that tables in a ``WHERE`` subquery are parsed correctly.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT name
 FROM t1
 WHERE regionkey = (SELECT max(regionkey) FROM t2)
-"""
-        )
-        == {Table("t1"), Table("t2")}
-    )
+""") == {Table("t1"), Table("t2")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT name
 FROM t1
 WHERE regionkey IN (SELECT regionkey FROM t2)
-"""
-        )
-        == {Table("t1"), Table("t2")}
-    )
+""") == {Table("t1"), Table("t2")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT name
 FROM t1
 WHERE regionkey EXISTS (SELECT regionkey FROM t2)
-"""
-        )
-        == {Table("t1"), Table("t2")}
-    )
+""") == {Table("t1"), Table("t2")}
 
 
 def test_extract_tables_describe() -> None:
@@ -329,15 +289,10 @@ def test_extract_tables_show_partitions() -> None:
     """
     Test ``SHOW PARTITIONS``.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SHOW PARTITIONS FROM orders
 WHERE ds >= '2013-01-01' ORDER BY ds DESC
-"""
-        )
-        == {Table("orders")}
-    )
+""") == {Table("orders")}
 
 
 def test_extract_tables_join() -> None:
@@ -349,9 +304,7 @@ def test_extract_tables_join() -> None:
         Table("t2"),
     }
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT a.date, b.name
 FROM left_table a
 JOIN (
@@ -361,14 +314,9 @@ JOIN (
     FROM right_table
 ) b
 ON a.date = b.date
-"""
-        )
-        == {Table("left_table"), Table("right_table")}
-    )
+""") == {Table("left_table"), Table("right_table")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT a.date, b.name
 FROM left_table a
 LEFT INNER JOIN (
@@ -378,14 +326,9 @@ LEFT INNER JOIN (
     FROM right_table
 ) b
 ON a.date = b.date
-"""
-        )
-        == {Table("left_table"), Table("right_table")}
-    )
+""") == {Table("left_table"), Table("right_table")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT a.date, b.name
 FROM left_table a
 RIGHT OUTER JOIN (
@@ -395,14 +338,9 @@ RIGHT OUTER JOIN (
     FROM right_table
 ) b
 ON a.date = b.date
-"""
-        )
-        == {Table("left_table"), Table("right_table")}
-    )
+""") == {Table("left_table"), Table("right_table")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT a.date, b.name
 FROM left_table a
 FULL OUTER JOIN (
@@ -412,19 +350,14 @@ FULL OUTER JOIN (
         FROM right_table
 ) b
 ON a.date = b.date
-"""
-        )
-        == {Table("left_table"), Table("right_table")}
-    )
+""") == {Table("left_table"), Table("right_table")}
 
 
 def test_extract_tables_semi_join() -> None:
     """
     Test ``LEFT SEMI JOIN``.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT a.date, b.name
 FROM left_table a
 LEFT SEMI JOIN (
@@ -434,19 +367,14 @@ LEFT SEMI JOIN (
     FROM right_table
 ) b
 ON a.data = b.date
-"""
-        )
-        == {Table("left_table"), Table("right_table")}
-    )
+""") == {Table("left_table"), Table("right_table")}
 
 
 def test_extract_tables_combinations() -> None:
     """
     Test a complex case with nested queries.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT * FROM t1
 WHERE s11 > ANY (
     SELECT * FROM t1 UNION ALL SELECT * FROM (
@@ -459,14 +387,9 @@ WHERE s11 > ANY (
         )
     )
 )
-"""
-        )
-        == {Table("t1"), Table("t3"), Table("t4"), Table("t6")}
-    )
+""") == {Table("t1"), Table("t3"), Table("t4"), Table("t6")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT * FROM (
     SELECT * FROM (
         SELECT * FROM (
@@ -474,57 +397,39 @@ SELECT * FROM (
         ) AS S1
     ) AS S2
 ) AS S3
-"""
-        )
-        == {Table("EmployeeS")}
-    )
+""") == {Table("EmployeeS")}
 
 
 def test_extract_tables_with() -> None:
     """
     Test ``WITH``.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 WITH
     x AS (SELECT a FROM t1),
     y AS (SELECT a AS b FROM t2),
     z AS (SELECT b AS c FROM t3)
 SELECT c FROM z
-"""
-        )
-        == {Table("t1"), Table("t2"), Table("t3")}
-    )
+""") == {Table("t1"), Table("t2"), Table("t3")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 WITH
     x AS (SELECT a FROM t1),
     y AS (SELECT a AS b FROM x),
     z AS (SELECT b AS c FROM y)
 SELECT c FROM z
-"""
-        )
-        == {Table("t1")}
-    )
+""") == {Table("t1")}
 
 
 def test_extract_tables_reusing_aliases() -> None:
     """
     Test that the parser follows aliases.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 with q1 as ( select key from q2 where key = '5'),
 q2 as ( select key from src where key = '5')
 select * from (select key from q1) a
-"""
-        )
-        == {Table("src")}
-    )
+""") == {Table("src")}
 
 
 def test_extract_tables_multistatement() -> None:
@@ -546,8 +451,7 @@ def test_extract_tables_complex() -> None:
     Test a few complex queries.
     """
     assert (
-        extract_tables(
-            """
+        extract_tables("""
 SELECT sum(m_examples) AS "sum__m_example"
 FROM (
     SELECT
@@ -567,8 +471,7 @@ FROM (
 ) AS "meh"
 ORDER BY "sum__m_example" DESC
 LIMIT 10;
-"""
-        )
+""")
         == {
             Table("my_l_table"),
             Table("my_b_table"),
@@ -577,20 +480,13 @@ LIMIT 10;
         }
     )
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT *
 FROM table_a AS a, table_b AS b, table_c as c
 WHERE a.id = b.id and b.id = c.id
-"""
-        )
-        == {Table("table_a"), Table("table_b"), Table("table_c")}
-    )
+""") == {Table("table_a"), Table("table_b"), Table("table_c")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT somecol AS somecol
 FROM (
     WITH bla AS (
@@ -633,62 +529,42 @@ FROM (
     GROUP BY last_col
     LIMIT 50000
 )
-"""
-        )
-        == {Table("a"), Table("b"), Table("c"), Table("d"), Table("e"), Table("f")}
-    )
+""") == {Table("a"), Table("b"), Table("c"), Table("d"), Table("e"), Table("f")}
 
 
 def test_extract_tables_mixed_from_clause() -> None:
     """
     Test that the parser handles a ``FROM`` clause with table and subselect.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 SELECT *
 FROM table_a AS a, (select * from table_b) AS b, table_c as c
 WHERE a.id = b.id and b.id = c.id
-"""
-        )
-        == {Table("table_a"), Table("table_b"), Table("table_c")}
-    )
+""") == {Table("table_a"), Table("table_b"), Table("table_c")}
 
 
 def test_extract_tables_nested_select() -> None:
     """
     Test that the parser handles selects inside functions.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 select (extractvalue(1,concat(0x7e,(select GROUP_CONCAT(TABLE_NAME)
 from INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_SCHEMA like "%bi%"),0x7e)));
-"""
-        )
-        == {Table("COLUMNS", "INFORMATION_SCHEMA")}
-    )
+""") == {Table("COLUMNS", "INFORMATION_SCHEMA")}
 
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 select (extractvalue(1,concat(0x7e,(select GROUP_CONCAT(COLUMN_NAME)
 from INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME="bi_achivement_daily"),0x7e)));
-"""
-        )
-        == {Table("COLUMNS", "INFORMATION_SCHEMA")}
-    )
+""") == {Table("COLUMNS", "INFORMATION_SCHEMA")}
 
 
 def test_extract_tables_complex_cte_with_prefix() -> None:
     """
     Test that the parser handles CTEs with prefixes.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 WITH CTE__test (SalesPersonID, SalesOrderID, SalesYear)
 AS (
     SELECT SalesPersonID, SalesOrderID, YEAR(OrderDate) AS SalesYear
@@ -699,27 +575,19 @@ SELECT SalesPersonID, COUNT(SalesOrderID) AS TotalSales, SalesYear
 FROM CTE__test
 GROUP BY SalesYear, SalesPersonID
 ORDER BY SalesPersonID, SalesYear;
-"""
-        )
-        == {Table("SalesOrderHeader")}
-    )
+""") == {Table("SalesOrderHeader")}
 
 
 def test_extract_tables_identifier_list_with_keyword_as_alias() -> None:
     """
     Test that aliases that are keywords are parsed correctly.
     """
-    assert (
-        extract_tables(
-            """
+    assert extract_tables("""
 WITH
     f AS (SELECT * FROM foo),
     match AS (SELECT * FROM f)
 SELECT * FROM match
-"""
-        )
-        == {Table("foo")}
-    )
+""") == {Table("foo")}
 
 
 def test_update() -> None:
@@ -733,12 +601,10 @@ def test_set() -> None:
     """
     Test that ``SET`` is detected correctly.
     """
-    query = ParsedQuery(
-        """
+    query = ParsedQuery("""
 -- comment
 SET hivevar:desc='Legislators';
-"""
-    )
+""")
     assert query.is_set() is True
     assert query.is_select() is False
 
@@ -750,13 +616,11 @@ def test_show() -> None:
     """
     Test that ``SHOW`` is detected correctly.
     """
-    query = ParsedQuery(
-        """
+    query = ParsedQuery("""
 -- comment
 SHOW LOCKS test EXTENDED;
 -- comment
-"""
-    )
+""")
     assert query.is_show() is True
     assert query.is_select() is False
 
@@ -773,20 +637,13 @@ def test_is_explain() -> None:
     assert ParsedQuery("EXPLAIN SELECT 1").is_explain() is True
     assert ParsedQuery("EXPLAIN SELECT 1").is_select() is False
 
-    assert (
-        ParsedQuery(
-            """
+    assert ParsedQuery("""
 -- comment
 EXPLAIN select * from table
 -- comment 2
-"""
-        ).is_explain()
-        is True
-    )
+""").is_explain() is True
 
-    assert (
-        ParsedQuery(
-            """
+    assert ParsedQuery("""
 -- comment
 EXPLAIN select * from table
 where col1 = 'something'
@@ -796,44 +653,26 @@ where col1 = 'something'
 EXPLAIN select * from table
 where col1 = 'something'
 -- comment 4
-"""
-        ).is_explain()
-        is True
-    )
+""").is_explain() is True
 
-    assert (
-        ParsedQuery(
-            """
+    assert ParsedQuery("""
 -- This is a comment
     -- this is another comment but with a space in the front
 EXPLAIN SELECT * FROM TABLE
-"""
-        ).is_explain()
-        is True
-    )
+""").is_explain() is True
 
-    assert (
-        ParsedQuery(
-            """
+    assert ParsedQuery("""
 /* This is a comment
      with stars instead */
 EXPLAIN SELECT * FROM TABLE
-"""
-        ).is_explain()
-        is True
-    )
+""").is_explain() is True
 
-    assert (
-        ParsedQuery(
-            """
+    assert ParsedQuery("""
 -- comment
 select * from table
 where col1 = 'something'
 -- comment 2
-"""
-        ).is_explain()
-        is False
-    )
+""").is_explain() is False
 
 
 def test_is_valid_ctas() -> None:
@@ -958,20 +797,17 @@ def test_is_select_cte_with_comments() -> None:
     """
     Some CTES with comments are not correctly identified as SELECTS.
     """
-    sql = ParsedQuery(
-        """WITH blah AS
+    sql = ParsedQuery("""WITH blah AS
   (SELECT * FROM core_dev.manager_team),
 
 blah2 AS
   (SELECT * FROM core_dev.manager_workspace)
 
 SELECT * FROM blah
-INNER JOIN blah2 ON blah2.team_id = blah.team_id"""
-    )
+INNER JOIN blah2 ON blah2.team_id = blah.team_id""")
     assert sql.is_select()
 
-    sql = ParsedQuery(
-        """WITH blah AS
+    sql = ParsedQuery("""WITH blah AS
 /*blahblahbalh*/
   (SELECT * FROM core_dev.manager_team),
 --blahblahbalh
@@ -980,8 +816,7 @@ blah2 AS
   (SELECT * FROM core_dev.manager_workspace)
 
 SELECT * FROM blah
-INNER JOIN blah2 ON blah2.team_id = blah.team_id"""
-    )
+INNER JOIN blah2 ON blah2.team_id = blah.team_id""")
     assert sql.is_select()
 
 
@@ -990,8 +825,7 @@ def test_cte_is_select() -> None:
     Some CTEs are not correctly identified as SELECTS.
     """
     # `AS(` gets parsed as a function
-    sql = ParsedQuery(
-        """WITH foo AS(
+    sql = ParsedQuery("""WITH foo AS(
 SELECT
   FLOOR(__time TO WEEK) AS "week",
   name,
@@ -1003,25 +837,25 @@ SELECT
   f.week,
   f.name,
   f.unique_users
-FROM foo f"""
-    )
+FROM foo f""")
     assert sql.is_select()
 
 
 def test_unknown_select() -> None:
     """
-    Test that `is_select` works when sqlparse fails to identify the type.
+    Test that `is_select` works for CTEs, whether or not sqlparse identifies
+    the statement type (sqlparse>=0.4.4 reports SELECT, older versions UNKNOWN).
     """
     sql = "WITH foo AS(SELECT 1) SELECT 1"
-    assert sqlparse.parse(sql)[0].get_type() == "UNKNOWN"
+    assert sqlparse.parse(sql)[0].get_type() in {"UNKNOWN", "SELECT"}
     assert ParsedQuery(sql).is_select()
 
     sql = "WITH foo AS(SELECT 1) INSERT INTO my_table (a) VALUES (1)"
-    assert sqlparse.parse(sql)[0].get_type() == "UNKNOWN"
+    assert sqlparse.parse(sql)[0].get_type() in {"UNKNOWN", "INSERT"}
     assert not ParsedQuery(sql).is_select()
 
     sql = "WITH foo AS(SELECT 1) DELETE FROM my_table"
-    assert sqlparse.parse(sql)[0].get_type() == "UNKNOWN"
+    assert sqlparse.parse(sql)[0].get_type() in {"UNKNOWN", "DELETE"}
     assert not ParsedQuery(sql).is_select()
 
 
@@ -1069,12 +903,10 @@ def test_basic_breakdown_statements() -> None:
     """
     Test that multiple statements are parsed correctly.
     """
-    query = ParsedQuery(
-        """
+    query = ParsedQuery("""
 SELECT * FROM birth_names;
 SELECT * FROM birth_names LIMIT 1;
-"""
-    )
+""")
     assert query.get_statements() == [
         "SELECT * FROM birth_names",
         "SELECT * FROM birth_names LIMIT 1",
@@ -1085,14 +917,12 @@ def test_messy_breakdown_statements() -> None:
     """
     Test the messy multiple statements are parsed correctly.
     """
-    query = ParsedQuery(
-        """
+    query = ParsedQuery("""
 SELECT 1;\t\n\n\n  \t
 \t\nSELECT 2;
 SELECT * FROM birth_names;;;
 SELECT * FROM birth_names LIMIT 1
-"""
-    )
+""")
     assert query.get_statements() == [
         "SELECT 1",
         "SELECT 2",

@@ -43,8 +43,11 @@ def session(mocker: MockFixture) -> Iterator[Session]:
     in_memory_session.remove = lambda: None
 
     # patch session
+    # ``get_session`` is a property, so patch it with a ``PropertyMock``; a plain
+    # ``MagicMock`` breaks FAB's ``create_db`` under SQLAlchemy 1.4
     mocker.patch(
         "superset.security.SupersetSecurityManager.get_session",
+        new_callable=mocker.PropertyMock,
         return_value=in_memory_session,
     )
     mocker.patch("superset.db.session", in_memory_session)

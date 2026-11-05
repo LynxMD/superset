@@ -107,13 +107,25 @@ def test_time_exp_mixd_case_col_1y(app_context: AppContext) -> None:
 @pytest.mark.parametrize(
     "actual,expected",
     [
-        ("DATE", "CONVERT(DATE, '2019-01-02', 23)",),
-        ("DATETIME", "CONVERT(DATETIME, '2019-01-02T03:04:05.678', 126)",),
-        ("SMALLDATETIME", "CONVERT(SMALLDATETIME, '2019-01-02 03:04:05', 20)",),
+        (
+            "DATE",
+            "CONVERT(DATE, '2019-01-02', 23)",
+        ),
+        (
+            "DATETIME",
+            "CONVERT(DATETIME, '2019-01-02T03:04:05.678', 126)",
+        ),
+        (
+            "SMALLDATETIME",
+            "CONVERT(SMALLDATETIME, '2019-01-02 03:04:05', 20)",
+        ),
     ],
 )
 def test_convert_dttm(
-    app_context: AppContext, actual: str, expected: str, dttm: datetime,
+    app_context: AppContext,
+    actual: str,
+    expected: str,
+    dttm: datetime,
 ) -> None:
     from superset.db_engine_specs.mssql import MssqlEngineSpec
 
@@ -151,7 +163,9 @@ def test_fetch_data(app_context: AppContext) -> None:
     from superset.db_engine_specs.mssql import MssqlEngineSpec
 
     with mock.patch.object(
-        MssqlEngineSpec, "pyodbc_rows_to_tuples", return_value="converted",
+        MssqlEngineSpec,
+        "pyodbc_rows_to_tuples",
+        return_value="converted",
     ) as mock_pyodbc_rows_to_tuples:
         data = [(1, "foo")]
         with mock.patch.object(BaseEngineSpec, "fetch_data", return_value=data):
@@ -184,8 +198,7 @@ def test_column_datatype_to_string(
     "original,expected",
     [
         (
-            dedent(
-                """
+            dedent("""
 with currency as (
 select 'INR' as cur
 ),
@@ -193,10 +206,8 @@ currency_2 as (
 select 'EUR' as cur
 )
 select * from currency union all select * from currency_2
-"""
-            ),
-            dedent(
-                """WITH currency as (
+"""),
+            dedent("""WITH currency as (
 select 'INR' as cur
 ),
 currency_2 as (
@@ -204,20 +215,20 @@ select 'EUR' as cur
 ),
 __cte AS (
 select * from currency union all select * from currency_2
-)"""
-            ),
+)"""),
         ),
-        ("SELECT 1 as cnt", None,),
         (
-            dedent(
-                """
+            "SELECT 1 as cnt",
+            None,
+        ),
+        (
+            dedent("""
 select 'INR' as cur
 union
 select 'AUD' as cur
 union
 select 'USD' as cur
-"""
-            ),
+"""),
             None,
         ),
     ],
@@ -268,12 +279,10 @@ def test_extract_errors(app_context: AppContext) -> None:
     """
     from superset.db_engine_specs.mssql import MssqlEngineSpec
 
-    msg = dedent(
-        """
+    msg = dedent("""
 DB-Lib error message 20009, severity 9:
 Unable to connect: Adaptive Server is unavailable or does not exist (locahost)
-        """
-    )
+        """)
     result = MssqlEngineSpec.extract_errors(Exception(msg))
     assert result == [
         SupersetError(
@@ -292,16 +301,14 @@ Unable to connect: Adaptive Server is unavailable or does not exist (locahost)
         )
     ]
 
-    msg = dedent(
-        """
+    msg = dedent("""
 DB-Lib error message 20009, severity 9:
 Unable to connect: Adaptive Server is unavailable or does not exist (localhost)
 Net-Lib error during Connection refused (61)
 DB-Lib error message 20009, severity 9:
 Unable to connect: Adaptive Server is unavailable or does not exist (localhost)
 Net-Lib error during Connection refused (61)
-        """
-    )
+        """)
     result = MssqlEngineSpec.extract_errors(
         Exception(msg), context={"port": 12345, "hostname": "localhost"}
     )
@@ -319,16 +326,14 @@ Net-Lib error during Connection refused (61)
         )
     ]
 
-    msg = dedent(
-        """
+    msg = dedent("""
 DB-Lib error message 20009, severity 9:
 Unable to connect: Adaptive Server is unavailable or does not exist (example.com)
 Net-Lib error during Operation timed out (60)
 DB-Lib error message 20009, severity 9:
 Unable to connect: Adaptive Server is unavailable or does not exist (example.com)
 Net-Lib error during Operation timed out (60)
-        """
-    )
+        """)
     result = MssqlEngineSpec.extract_errors(
         Exception(msg), context={"port": 12345, "hostname": "example.com"}
     )
@@ -352,16 +357,14 @@ Net-Lib error during Operation timed out (60)
         )
     ]
 
-    msg = dedent(
-        """
+    msg = dedent("""
 DB-Lib error message 20009, severity 9:
 Unable to connect: Adaptive Server is unavailable or does not exist (93.184.216.34)
 Net-Lib error during Operation timed out (60)
 DB-Lib error message 20009, severity 9:
 Unable to connect: Adaptive Server is unavailable or does not exist (93.184.216.34)
 Net-Lib error during Operation timed out (60)
-        """
-    )
+        """)
     result = MssqlEngineSpec.extract_errors(
         Exception(msg), context={"port": 12345, "hostname": "93.184.216.34"}
     )
@@ -385,16 +388,14 @@ Net-Lib error during Operation timed out (60)
         )
     ]
 
-    msg = dedent(
-        """
+    msg = dedent("""
 DB-Lib error message 20018, severity 14:
 General SQL Server error: Check messages from the SQL Server
 DB-Lib error message 20002, severity 9:
 Adaptive Server connection failed (mssqldb.cxiotftzsypc.us-west-2.rds.amazonaws.com)
 DB-Lib error message 20002, severity 9:
 Adaptive Server connection failed (mssqldb.cxiotftzsypc.us-west-2.rds.amazonaws.com)
-        """
-    )
+        """)
     result = MssqlEngineSpec.extract_errors(
         Exception(msg), context={"username": "testuser", "database": "testdb"}
     )

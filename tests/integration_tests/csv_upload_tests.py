@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset CSV upload"""
+
 import json
 import logging
 import os

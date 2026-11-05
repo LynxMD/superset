@@ -86,12 +86,10 @@ class AsyncQueryManager:
             config["CACHE_CONFIG"]["CACHE_TYPE"] == "null"
             or config["DATA_CACHE_CONFIG"]["CACHE_TYPE"] == "null"
         ):
-            raise Exception(
-                """
+            raise Exception("""
                 Cache backends (CACHE_CONFIG, DATA_CACHE_CONFIG) must be configured
                 and non-null in order to enable async queries
-                """
-            )
+                """)
 
         if len(config["GLOBAL_ASYNC_QUERIES_JWT_SECRET"]) < 32:
             raise AsyncQueryTokenException(

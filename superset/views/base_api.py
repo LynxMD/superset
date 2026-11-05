@@ -249,11 +249,12 @@ class BaseSupersetModelRestApi(ModelRestApi):
         if self.apispec_parameter_schemas is None:  # type: ignore
             self.apispec_parameter_schemas = {}
         self.apispec_parameter_schemas["get_related_schema"] = get_related_schema
-        self.openapi_spec_component_schemas: Tuple[
-            Type[Schema], ...
-        ] = self.openapi_spec_component_schemas + (
-            RelatedResponseSchema,
-            DistincResponseSchema,
+        self.openapi_spec_component_schemas: Tuple[Type[Schema], ...] = (
+            self.openapi_spec_component_schemas
+            + (
+                RelatedResponseSchema,
+                DistincResponseSchema,
+            )
         )
 
     def create_blueprint(

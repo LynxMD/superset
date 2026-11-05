@@ -21,6 +21,7 @@ Revises: d6ffdf31bdd4
 Create Date: 2019-07-15 12:00:32.267507
 
 """
+
 import logging
 
 from alembic import op
