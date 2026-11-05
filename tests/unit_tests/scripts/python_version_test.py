@@ -19,15 +19,17 @@ Guard tests: `.python-version` is the single source of the Python version.
 
 Every Docker image and build script must take the version from that file.
 Example: to move to Python 3.15, a developer edits `.python-version` only, and
-the Dockerfiles, the CI image build, the release scripts and the Makefile all
+the Dockerfiles, the GitHub workflows, the CI image build, the release scripts and the Makefile all
 follow.
 """
 
 import re
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import pytest
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 PYTHON_VERSION = (REPO_ROOT / ".python-version").read_text().strip()
@@ -119,3 +121,64 @@ def test_makefile_reads_python_version_file() -> None:
     text = (REPO_ROOT / "Makefile").read_text()
     assert not HARDCODED_PYTHON.search(text), "hardcoded Python version"
     assert "cat .python-version" in text
+
+
+HARDCODED_CI_PYTHON = re.compile(r"(?i)python[\w-]*[\"']?\s*[:=]\s*\[?\s*[\"']?3\.\d+")
+SETUP_PYTHON_STEPS = ("actions/setup-python", "./.github/actions/setup-backend")
+
+
+def ci_files() -> list[Path]:
+    return tracked_files(".github/*.yml", ".github/*.yaml", ".github/*.sh")
+
+
+def workflow_jobs() -> list[tuple[str, str, list[dict[str, Any]]]]:
+    jobs = []
+    for path in tracked_files(".github/workflows/*.yml"):
+        for name, job in (yaml.safe_load(path.read_text()).get("jobs") or {}).items():
+            jobs.append((path.name, name, job.get("steps") or []))
+    return jobs
+
+
+def all_steps() -> list[tuple[str, dict[str, Any]]]:
+    steps = [
+        (f"{wf}:{job}", step)
+        for wf, job, job_steps in workflow_jobs()
+        for step in job_steps
+    ]
+    for path in tracked_files(".github/actions/*.yml"):
+        action = yaml.safe_load(path.read_text())
+        for step in action.get("runs", {}).get("steps") or []:
+            steps.append((str(path.relative_to(REPO_ROOT)), step))
+    return steps
+
+
+@pytest.mark.parametrize(
+    "path", ci_files(), ids=lambda p: str(p.relative_to(REPO_ROOT))
+)
+def test_ci_has_no_hardcoded_python_version(path: Path) -> None:
+    for number, line in enumerate(path.read_text().splitlines(), 1):
+        assert not HARDCODED_CI_PYTHON.search(line), f"line {number}: {line.strip()}"
+
+
+def test_setup_python_reads_python_version_file() -> None:
+    setups = [
+        (where, step)
+        for where, step in all_steps()
+        if str(step.get("uses", "")).startswith("actions/setup-python")
+    ]
+    assert setups
+    for where, step in setups:
+        options = step.get("with") or {}
+        assert options.get("python-version-file") == ".python-version", where
+        assert "python-version" not in options, where
+
+
+def test_checkout_comes_before_python_setup() -> None:
+    """`python-version-file` needs the repo on disk before Python is set up."""
+    for workflow, job, steps in workflow_jobs():
+        for index, step in enumerate(steps):
+            if str(step.get("uses", "")).startswith(SETUP_PYTHON_STEPS):
+                before = [str(s.get("uses", "")) for s in steps[:index]]
+                assert any(
+                    u.startswith("actions/checkout") for u in before
+                ), f"{workflow}:{job}"

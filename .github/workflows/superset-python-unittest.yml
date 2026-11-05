@@ -12,9 +12,6 @@ jobs:
   unit-tests:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ["3.14"]
     env:
       PYTHONPATH: ${{ github.workspace }}
     steps:
@@ -34,7 +31,7 @@ jobs:
         if: steps.check.outcome == 'failure'
         uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
           cache: 'pip'
           cache-dependency-path: 'requirements/testing.txt'
 # TODO: separated requiermentes.txt file just for unit tests

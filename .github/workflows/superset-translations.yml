@@ -33,9 +33,6 @@ jobs:
   babel-extract:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ["3.14"]
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
         uses: actions/checkout@v7
@@ -45,7 +42,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: .python-version
       - name: Install dependencies
         uses: ./.github/actions/cached-dependencies
         with:
