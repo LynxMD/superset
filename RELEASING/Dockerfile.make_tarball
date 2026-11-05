@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM python:3.8-buster
+# The Python version comes from .python-version (see make_tarball.sh)
+ARG PY_VER
+FROM python:${PY_VER}-bookworm
 
 RUN apt-get update -y
 RUN apt-get install -y jq

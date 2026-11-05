@@ -47,6 +47,7 @@ EOF
 # Build the "lean" image
 #
 docker build --target lean \
+  --build-arg PY_VER="$(cat .python-version)" \
   -t "${REPO_NAME}:${SHA}" \
   -t "${REPO_NAME}:${REFSPEC}" \
   -t "${REPO_NAME}:${LATEST_TAG}" \
@@ -60,6 +61,7 @@ docker build --target lean \
 # Build the dev image
 #
 docker build --target dev \
+  --build-arg PY_VER="$(cat .python-version)" \
   -t "${REPO_NAME}:${SHA}-dev" \
   -t "${REPO_NAME}:${REFSPEC}-dev" \
   -t "${REPO_NAME}:${LATEST_TAG}-dev" \

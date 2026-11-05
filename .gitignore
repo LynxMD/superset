@@ -33,7 +33,6 @@ cover
 .envrc
 .idea
 .mypy_cache
-.python-version
 .tox
 .vscode
 _build

@@ -24,6 +24,13 @@ assists people when migrating to a new version.
 
 ## Next
 
+- ENG-1596 (Lynx): `.python-version` is now the single source of the Python version.
+  The Dockerfiles have no default for the `PY_VER` build argument, so every build must
+  pass it in. The CI image build (`.github/workflows/docker_build_push.sh`,
+  `docker.yml`), the `RELEASING/` scripts and the `Makefile` read the file themselves.
+  Example for a local build: `docker build --build-arg PY_VER=$(cat .python-version) .`.
+  A guard test (`tests/unit_tests/scripts/python_version_test.py`) fails when a
+  Dockerfile or a build script hardcodes a Python version.
 - [19046](https://github.com/apache/superset/pull/19046): Enables the drag and drop interface in Explore control panel by default. Flips `ENABLE_EXPLORE_DRAG_AND_DROP` and `ENABLE_DND_WITH_CLICK_UX` feature flags to `True`.
 - [18936](https://github.com/apache/superset/pull/18936): Removes legacy SIP-15 interm logic/flags—specifically the `SIP_15_ENABLED`, `SIP_15_GRACE_PERIOD_END`, `SIP_15_DEFAULT_TIME_RANGE_ENDPOINTS`, and `SIP_15_TOAST_MESSAGE` flags. Time range endpoints are no longer configurable and strictly adhere to the `[start, end)` paradigm, i.e., inclusive of the start and exclusive of the end. Additionally this change removes the now obsolete `time_range_endpoints` from the form-data and resulting in the cache being busted.
 
